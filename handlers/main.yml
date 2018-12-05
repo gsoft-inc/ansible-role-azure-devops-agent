@@ -1,0 +1,17 @@
+- name: restart az-devops-agent
+  command: echo "restarting az-devops-agent..."
+  notify:
+    - stop az-devops-agent
+    - start az-devops-agent
+
+- name: start az-devops-agent
+  command: ./svc.sh start
+  become: true
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+
+- name: stop az-devops-agent
+  command: ./svc.sh stop
+  become: true
+  args:
+    chdir: "{{ az_devops_agent_folder }}"

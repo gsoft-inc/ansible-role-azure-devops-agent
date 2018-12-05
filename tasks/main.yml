@@ -1,0 +1,94 @@
+- name: Install requirements
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - libunwind8
+      - libcurl3
+
+- name: Add a agent user
+  user: name="{{ az_devops_agent_user }}" comment="Azure DevOps Agent"
+
+- name: Create directories
+  file: state=directory path="{{ item }}" owner="{{ az_devops_agent_user }}" group="{{ az_devops_agent_user }}" mode=0755
+  with_items:
+    - "{{ az_devops_agent_folder }}"
+    - "{{ az_devops_work_folder }}"
+
+- name: Download and unarchive
+  unarchive:
+    src: https://vstsagentpackage.azureedge.net/agent/{{ az_devops_agent_version }}/vsts-agent-linux-x64-{{ az_devops_agent_version }}.tar.gz
+    dest: "{{ az_devops_agent_folder }}"
+    remote_src: yes
+    owner: "{{ az_devops_agent_user }}"
+    group: "{{ az_devops_agent_user }}"
+    creates: "{{ az_devops_agent_folder }}/config.sh"
+
+- name: Uninstall agent service
+  command: ./svc.sh uninstall
+  become: true
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+    removes: "{{ az_devops_agent_folder }}/runsvc.sh"
+  ignore_errors: true
+
+- name: Unconfigure az-devops-agent
+  command: "./config.sh remove --auth PAT --token {{ az_devops_accesstoken }}"
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+    removes: "{{ az_devops_agent_folder }}/.agent"
+  become_user: "{{ az_devops_agent_user }}"
+  ignore_errors: true
+
+- name: Configure az-devops-agent
+  command: >
+    ./config.sh
+    --unattended
+    --pool '{{ az_devops_agent_pool_name }}'
+    --acceptteeeula
+    --agent '{{ az_devops_agent_name }}'
+    --url '{{ az_devops_server_url }}'
+    --work _work
+    --auth PAT
+    --token '{{ az_devops_accesstoken }}'
+    --runasservice
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+    creates: "{{ az_devops_agent_folder }}/.agent"
+  become_user: "{{ az_devops_agent_user }}"
+  when: az_devops_agent_role == 'build'
+
+- name: Configure az-devops-agent
+  command: >
+    ./config.sh
+    --unattended
+    --deploymentgroup
+    --deploymentgroupname '{{ az_devops_deployment_group_name }}'
+    --addDeploymentGroupTags
+    --deploymentGroupTags '{{ az_devops_deployment_group_tags }}'
+    --projectname '{{ az_devops_project_name }}'
+    --acceptteeeula
+    --agent '{{ az_devops_agent_name }}'
+    --url '{{ az_devops_server_url }}'
+    --work _work
+    --auth PAT
+    --token '{{ az_devops_accesstoken }}'
+    --runasservice
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+    creates: "{{ az_devops_agent_folder }}/.agent"
+  become_user: "{{ az_devops_agent_user }}"
+  when: az_devops_agent_role == 'deployment'
+
+- name: Install agent service
+  command: ./svc.sh install {{ az_devops_agent_user }}
+  become: true
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+
+- name: Start agent service
+  command: ./svc.sh start
+  become: true
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
