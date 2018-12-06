@@ -4,12 +4,15 @@ An Ansible role that installs and configures a Linux machine to be used as an [A
 
 ## Requirements
 
-None.
+[See prerequisites](https://github.com/Microsoft/azure-pipelines-agent/blob/master/docs/start/envlinux.md)
 
 ## Role Variables
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
+    az_devops_accountname: null
+    az_devops_accesstoken: null
+    az_devops_project_name: null
     az_devops_agent_version: 2.142.1
     az_devops_agent_user: "az_devops_agent"
     az_devops_agent_name: "{{ ansible_hostname }}"
@@ -19,6 +22,21 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_agent_pool_name: "Default"
     az_devops_agent_role: "build"
     az_devops_deployment_group_tags: null
+    az_devops_deployment_group_name: "Default"
+
+- **az_devops_accountname**
+
+  The name of your Azure DevOps account, i.e. https://YOUR_ACCOUNT_NAME.visualstudio.com
+
+- **az_devops_accesstoken**
+
+  The Personal Access Token (PAT) used to authenticate to your account.  [See here for details on how to generate this value](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=vsts#authenticate-with-a-personal-access-token-pat).
+
+  _Note: Think about using Ansible Vault to secure this value._
+
+- **az_devops_project_name**
+
+  The name of the Azure DevOps project in which to register the agent.
 
 - **az_devops_agent_version**
 
@@ -47,6 +65,18 @@ Available variables are listed below, along with default values (see `defaults/m
 - **az_devops_agent_pool_name**
 
   Pool name in which the Azure DevOps agent is added.
+
+- **az_devops_agent_role**
+
+  Use either `build` or `deployment`.  Build role allows the use of the agent as a build server in pipeline build or releases.  Deployment role allows the use of the agent in a deployment group.
+
+- **az_devops_deployment_group_tags**
+
+  Use in conjuction with the `deployment` agent role.  Allows the use of tags to identify the agent (ex: QA, Staging, Prod, etc.)
+
+- **az_devops_deployment_group_name**
+
+  Use in conjuction with the `deployment` agent role.  The name of the deployment group in which to add the agent.
 
 ## Dependencies
 
