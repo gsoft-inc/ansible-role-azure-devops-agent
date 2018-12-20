@@ -98,9 +98,11 @@
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
+  changed_when: true
 
 - name: Start agent service
   command: ./svc.sh start
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
+  changed_when: true
