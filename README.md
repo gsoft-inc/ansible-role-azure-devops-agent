@@ -87,7 +87,7 @@ Including an example of how to use your role (for instance, with variables passe
          - yohanb.azure_devops_agent
       vars:
         - az_devops_agent_role: build
-        - az_devops_accountname: foobar
+        - az_devops_accountname: fubar
         - az_devops_accesstoken: ***
         - az_devops_project_name: baz
 
