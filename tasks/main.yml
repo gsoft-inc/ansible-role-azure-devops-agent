@@ -14,7 +14,8 @@
 
 - name: Create directories
   file:
-    state: directory path="{{ item }}"
+    state: directory
+    path: "{{ item }}"
     owner: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_user }}"
     mode: 0755
