@@ -4,12 +4,15 @@ An Ansible role that installs and configures a Linux machine to be used as an [A
 
 ## Requirements
 
-None.
+[See prerequisites](https://github.com/Microsoft/azure-pipelines-agent/blob/master/docs/start/envlinux.md)
 
 ## Role Variables
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
+    az_devops_accountname: null
+    az_devops_accesstoken: null
+    az_devops_project_name: null
     az_devops_agent_version: 2.142.1
     az_devops_agent_user: "az_devops_agent"
     az_devops_agent_name: "{{ ansible_hostname }}"
@@ -19,6 +22,21 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_agent_pool_name: "Default"
     az_devops_agent_role: "build"
     az_devops_deployment_group_tags: null
+    az_devops_deployment_group_name: "Default"
+
+- **az_devops_accountname**
+
+  The name of your Azure DevOps account, i.e. https://YOUR_ACCOUNT_NAME.visualstudio.com
+
+- **az_devops_accesstoken**
+
+  The Personal Access Token (PAT) used to authenticate to your account. [See here for details on how to generate this value](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=vsts#authenticate-with-a-personal-access-token-pat).
+
+  _Note: Think about using Ansible Vault to secure this value._
+
+- **az_devops_project_name**
+
+  The name of the Azure DevOps project in which to register the agent.
 
 - **az_devops_agent_version**
 
@@ -50,24 +68,28 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_agent_role**
 
-  Agent role, either `build` or `deployment`. The build role adds the agent as a build server. The deployment role adds the agent as a deployment server.
+  Use either `build` or `deployment`. Build role allows the use of the agent as a build server in pipeline build or releases. Deployment role allows the use of the agent in a deployment group.
 
-## Dependencies
+- **az_devops_deployment_group_tags**
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+  Use in conjuction with the `deployment` agent role. Allows the use of tags to identify the agent (ex: QA, Staging, Prod, etc.)
+
+- **az_devops_deployment_group_name**
+
+  Use in conjuction with the `deployment` agent role. The name of the deployment group in which to add the agent.
 
 ## Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
+    - hosts: agents
       roles:
-         - { role: username.rolename, x: 42 }
+         - yohanb.azure-devops-agent
+      vars:
+        - az_devops_accountname: foobar
+        - az_devops_accesstoken: ***
+        - az_devops_project_name: baz
 
 ## License
 
-BSD
-
-## Author Information
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Apache-2.0
