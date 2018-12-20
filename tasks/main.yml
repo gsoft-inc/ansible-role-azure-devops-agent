@@ -6,12 +6,14 @@
     packages:
       - libunwind8
       - libcurl3
+  register: result
+  until: result is succeeded
 
 - name: Add a agent user
   user: name="{{ az_devops_agent_user }}" comment="Azure DevOps Agent"
 
 - name: Create directories
-  file: 
+  file:
     state: directory path="{{ item }}"
     owner: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_user }}"
@@ -45,6 +47,7 @@
   args:
     chdir: "{{ az_devops_agent_folder }}"
     removes: "{{ az_devops_agent_folder }}/.agent"
+  become: true
   become_user: "{{ az_devops_agent_user }}"
   ignore_errors: true
 
