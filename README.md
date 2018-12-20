@@ -48,6 +48,10 @@ Available variables are listed below, along with default values (see `defaults/m
 
   Pool name in which the Azure DevOps agent is added.
 
+- **az_devops_agent_role**
+
+  Agent role, either `build` or `deployment`. The build role adds the agent as a build server. The deployment role adds the agent as a deployment server.
+
 ## Dependencies
 
 A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
