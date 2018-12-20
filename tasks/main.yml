@@ -42,7 +42,7 @@
     removes: "{{ az_devops_agent_folder }}/runsvc.sh"
   ignore_errors: true
 
-- name: Unconfigure az-devops-agent
+- name: Unconfigure agent
   command: "./config.sh remove --auth PAT --token {{ az_devops_accesstoken }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
@@ -51,7 +51,7 @@
   become_user: "{{ az_devops_agent_user }}"
   ignore_errors: true
 
-- name: Configure az-devops-agent
+- name: Configure agent as build server
   command: >
     ./config.sh
     --unattended
@@ -70,7 +70,7 @@
   become_user: "{{ az_devops_agent_user }}"
   when: az_devops_agent_role == 'build'
 
-- name: Configure az-devops-agent
+- name: Configure agent as deployment server
   command: >
     ./config.sh
     --unattended

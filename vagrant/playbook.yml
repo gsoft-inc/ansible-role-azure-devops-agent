@@ -1,7 +1,0 @@
-- hosts: all
-  become: true
-  roles:
-    - azure_devops_agent
-
-  vars_files:
-    - vars.yml
