@@ -25,10 +25,9 @@
 
 - name: Download and unarchive
   unarchive:
-    src: |
-      https://vstsagentpackage.azureedge.net/agent/
-      {{ az_devops_agent_version }}/
-      vsts-agent-linux-x64-{{ az_devops_agent_version }}.tar.gz
+    src: "https://vstsagentpackage.azureedge.net/agent/\
+      {{ az_devops_agent_version }}/\
+      vsts-agent-linux-x64-{{ az_devops_agent_version }}.tar.gz"
     dest: "{{ az_devops_agent_folder }}"
     remote_src: yes
     owner: "{{ az_devops_agent_user }}"
