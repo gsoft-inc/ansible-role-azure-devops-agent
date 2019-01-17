@@ -1,6 +1,7 @@
-# Role Name
+# Azure DevOps Agent
 
 An Ansible role that installs and configures a Linux machine to be used as an [Azure DevOps build or deployment agent](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=vsts).
+See [this blog post](https://medium.com/gsoft-tech/easily-configuring-an-azure-devops-agent-with-ansible-fb9cb0f98b73) for more detail.
 
 ## Requirements
 
