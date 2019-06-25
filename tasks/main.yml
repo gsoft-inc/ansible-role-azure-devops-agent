@@ -1,11 +1,10 @@
 - name: Install requirements
   apt:
-    name: "{{ packages }}"
+    name: "{{ item }}"
     state: present
-  vars:
-    packages:
-      - libunwind8
-      - libcurl3
+  with_items:
+    - libunwind8
+    - libcurl3
   register: result
   until: result is succeeded
 
