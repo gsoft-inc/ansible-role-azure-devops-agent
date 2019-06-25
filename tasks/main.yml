@@ -6,7 +6,10 @@
   until: result is succeeded
 
 - name: Add a agent user
-  user: name="{{ az_devops_agent_user }}" comment="Azure DevOps Agent"
+  user:
+    name: "{{ az_devops_agent_user }}"
+    comment: "Azure DevOps Agent"
+    shell: /bin/bash
 
 - name: Create directories
   file:
