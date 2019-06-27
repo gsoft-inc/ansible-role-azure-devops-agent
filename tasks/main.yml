@@ -1,6 +1,6 @@
 - name: Install requirements
   apt:
-    name: ["libcurl4", "libunwind8"]
+    name: ["libcurl3", "libunwind8"]
     state: present
   register: result
   until: result is succeeded
