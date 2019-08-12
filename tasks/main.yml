@@ -1,3 +1,24 @@
+- name: Set agent config facts
+  set_fact:
+    agent_cmd_args: 
+      - "./config.sh"
+      - "--unattended"
+      - "--acceptteeeula"
+      - "--agent '{{ az_devops_agent_name }}'"
+      - "--url '{{ az_devops_server_url }}'"
+      - "--work _work"
+      - "--auth PAT"
+      - "--token '{{ az_devops_accesstoken }}'"
+      - "--runasservice"
+    build_agent_cmd_args:
+      - "--pool '{{ az_devops_agent_pool_name }}'"
+    deployment_agent_cmd_args:
+      - "--deploymentgroup"
+      - "--deploymentgroupname '{{ az_devops_deployment_group_name }}'"
+      - "--addDeploymentGroupTags"
+      - "--deploymentGroupTags '{{ az_devops_deployment_group_tags }}'"
+      - "--projectname '{{ az_devops_project_name }}'"
+
 - name: Install requirements
   apt:
     name: ["libcurl3", "libunwind8"]
@@ -33,13 +54,22 @@
     group: "{{ az_devops_agent_user }}"
     creates: "{{ az_devops_agent_folder }}/config.sh"
 
+- name: Register agent service status
+  shell: ./svc.sh status | grep -q \(running\)
+  become: true
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+  changed_when: false
+  failed_when: service_running.rc not in [0,1]
+  register: service_running
+
 - name: Uninstall agent service
   command: ./svc.sh uninstall
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
     removes: "{{ az_devops_agent_folder }}/runsvc.sh"
-  ignore_errors: true
+  when: service_running.rc == 0
 
 - name: Unconfigure agent
   command: "./config.sh remove --auth PAT --token {{ az_devops_accesstoken }}"
@@ -48,20 +78,16 @@
     removes: "{{ az_devops_agent_folder }}/.agent"
   become: true
   become_user: "{{ az_devops_agent_user }}"
-  ignore_errors: true
+  when: service_running.rc == 0
+
+- name: Add '--replace' configuration argument
+  set_fact:
+    build_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
+    deployment_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
+  when: az_devops_agent_replace_existing
 
 - name: Configure agent as build server
-  command: >
-    ./config.sh
-    --unattended
-    --pool '{{ az_devops_agent_pool_name }}'
-    --acceptteeeula
-    --agent '{{ az_devops_agent_name }}'
-    --url '{{ az_devops_server_url }}'
-    --work _work
-    --auth PAT
-    --token '{{ az_devops_accesstoken }}'
-    --runasservice
+  command: "{{ (agent_cmd_args + build_agent_cmd_args) | join(' ') }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
     creates: "{{ az_devops_agent_folder }}/.agent"
@@ -71,21 +97,7 @@
     - az_devops_agent_role == 'build'
 
 - name: Configure agent as deployment server
-  command: >
-    ./config.sh
-    --unattended
-    --deploymentgroup
-    --deploymentgroupname '{{ az_devops_deployment_group_name }}'
-    --addDeploymentGroupTags
-    --deploymentGroupTags '{{ az_devops_deployment_group_tags }}'
-    --projectname '{{ az_devops_project_name }}'
-    --acceptteeeula
-    --agent '{{ az_devops_agent_name }}'
-    --url '{{ az_devops_server_url }}'
-    --work _work
-    --auth PAT
-    --token '{{ az_devops_accesstoken }}'
-    --runasservice
+  command: "{{ (agent_cmd_args + deployment_agent_cmd_args) | join(' ') }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
     creates: "{{ az_devops_agent_folder }}/.agent"
@@ -99,11 +111,9 @@
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
-  changed_when: true
 
 - name: Start agent service
   command: ./svc.sh start
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
-  changed_when: true
