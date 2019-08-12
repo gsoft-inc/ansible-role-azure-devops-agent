@@ -15,16 +15,17 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_accountname: null
     az_devops_accesstoken: null
     az_devops_project_name: null
-    az_devops_agent_version: 2.142.1
+    az_devops_agent_version: 2.155.1
     az_devops_agent_user: "az_devops_agent"
     az_devops_agent_name: "{{ ansible_hostname }}"
-    az_devops_server_url: "https://{{ az_devops_accountname }}.visualstudio.com/"
+    az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}"
     az_devops_agent_folder: "/home/{{ az_devops_agent_user }}/agent/"
     az_devops_work_folder: "/home/{{ az_devops_agent_user }}/work/"
     az_devops_agent_pool_name: "Default"
     az_devops_agent_role: "build"
     az_devops_deployment_group_tags: null
     az_devops_deployment_group_name: "Default"
+    az_devops_agent_replace_existing: false
 
 - **az_devops_accountname**
 
@@ -79,6 +80,10 @@ Available variables are listed below, along with default values (see `defaults/m
 - **az_devops_deployment_group_name**
 
   Use in conjuction with the `deployment` agent role. The name of the deployment group in which to add the agent.
+
+- **az_devops_agent_replace_existing**
+
+  Adds the `--replace` argument to the configuration script for the scenario where you need to replace an exiting agent with a new host.
 
 ## Example Playbook
 
