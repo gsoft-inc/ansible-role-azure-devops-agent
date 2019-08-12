@@ -69,7 +69,6 @@
   become_user: "{{ az_devops_agent_user }}"
   when:
     - az_devops_agent_role == 'build'
-    - install_az_devops_agent == 'true'
 
 - name: Configure agent as deployment server
   command: >
@@ -94,7 +93,6 @@
   become_user: "{{ az_devops_agent_user }}"
   when:
     - az_devops_agent_role == 'deployment'
-    - install_az_devops_agent == 'true'
 
 - name: Install agent service
   command: ./svc.sh install {{ az_devops_agent_user }}
