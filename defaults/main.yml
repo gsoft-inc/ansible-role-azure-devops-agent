@@ -1,7 +1,7 @@
-az_devops_agent_version: 2.142.1
+az_devops_agent_version: 2.153.2
 az_devops_agent_user: "az_devops_agent"
 az_devops_agent_name: "{{ ansible_hostname }}"
-az_devops_server_url: "https://{{ az_devops_accountname }}.visualstudio.com/"
+az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}/"
 az_devops_agent_folder: "/home/{{ az_devops_agent_user }}/agent/"
 az_devops_work_folder: "/home/{{ az_devops_agent_user }}/work/"
 az_devops_agent_pool_name: "Default"
