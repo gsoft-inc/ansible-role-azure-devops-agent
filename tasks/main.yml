@@ -115,11 +115,11 @@
 
 - name: Copy unit file
   template:
-    src: azure_devops_agent.service
-    dest: /usr/lib/systemd/system/
+    src: azure_devops_agent.service.j2
+    dest: /usr/lib/systemd/system/azure_devops_agent.service
   notify: restart az-devops-agent
 
-- name: start az-devops-agent
+- name: ensure az-devops-agent is enabled on boot
   become: true
   systemd:
     daemon_reload: true
