@@ -8,3 +8,4 @@ az_devops_agent_pool_name: "Default"
 az_devops_agent_role: "build"
 az_devops_deployment_group_tags: null
 az_devops_agent_replace_existing: false
+az_devops_agent_package_url: "https://vstsagentpackage.azureedge.net/agent/{{ az_devops_agent_version }}/vsts-agent-linux-x64-{{ az_devops_agent_version }}.tar.gz"
