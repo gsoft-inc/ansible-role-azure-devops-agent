@@ -20,9 +20,12 @@
       - "--projectname '{{ az_devops_project_name }}'"
 
 - name: Install requirements
-  apt:
-    name: ["libcurl3", "libunwind8"]
+  package:
+    name: "{{ item }}"
     state: present
+  loop:
+    - libcurl3
+    - libunwind8
   register: result
   until: result is succeeded
 
