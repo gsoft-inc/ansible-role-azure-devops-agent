@@ -1,6 +1,6 @@
 - name: Set agent config facts
   set_fact:
-    agent_cmd_args: 
+    agent_cmd_args:
       - "./config.sh"
       - "--unattended"
       - "--acceptteeeula"
@@ -112,8 +112,15 @@
   args:
     chdir: "{{ az_devops_agent_folder }}"
 
-- name: Start agent service
-  command: ./svc.sh start
+- name: Copy unit file
+  template:
+    src: azure_devops_agent.service
+    dest: /usr/lib/systemd/system/
+  notify: restart az-devops-agent
+
+- name: start az-devops-agent
   become: true
-  args:
-    chdir: "{{ az_devops_agent_folder }}"
+  systemd:
+    daemon_reload: true
+    state: started
+    name: azure_devops_agent
