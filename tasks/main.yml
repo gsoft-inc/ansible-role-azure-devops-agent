@@ -42,7 +42,7 @@
     owner: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_user }}"
     mode: 0755
-  with_items:
+  loop:
     - "{{ az_devops_agent_folder }}"
     - "{{ az_devops_work_folder }}"
 
