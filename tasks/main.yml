@@ -114,6 +114,7 @@
     chdir: "{{ az_devops_agent_folder }}"
 
 - name: Copy unit file
+  become: true
   template:
     src: azure_devops_agent.service.j2
     dest: /usr/lib/systemd/system/azure_devops_agent.service
