@@ -29,7 +29,7 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_accountname**
 
-  The name of your Azure DevOps account, i.e. https://YOUR_ACCOUNT_NAME.visualstudio.com
+  The name of your Azure DevOps account, i.e. ttps://dev.azure.com/YOUR_ACCOUNT_NAME
 
 - **az_devops_accesstoken**
 
@@ -39,7 +39,7 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_project_name**
 
-  The name of the Azure DevOps project in which to register the agent.
+  The name of the Azure DevOps project in which to register the agent (only used for deployment groups).
 
 - **az_devops_agent_version**
 
