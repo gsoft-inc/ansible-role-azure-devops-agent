@@ -20,7 +20,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_agent_name: "{{ ansible_hostname }}"
     az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}"
     az_devops_agent_folder: "/home/{{ az_devops_agent_user }}/agent/"
-    az_devops_work_folder: "/home/{{ az_devops_agent_user }}/work/"
+    az_devops_work_folder: "/home/{{ az_devops_agent_user }}/agent/_work"
     az_devops_agent_pool_name: "Default"
     az_devops_agent_role: "build"
     az_devops_deployment_group_tags: null
