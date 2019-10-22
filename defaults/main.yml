@@ -7,4 +7,5 @@ az_devops_work_folder: "/home/{{ az_devops_agent_user }}/agent/_work"
 az_devops_agent_pool_name: "Default"
 az_devops_agent_role: "build"
 az_devops_deployment_group_tags: null
+az_devops_deployment_group_name: "Default"
 az_devops_agent_replace_existing: false
