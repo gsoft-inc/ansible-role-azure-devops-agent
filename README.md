@@ -20,7 +20,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_agent_name: "{{ ansible_hostname }}"
     az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}"
     az_devops_agent_folder: "/home/{{ az_devops_agent_user }}/agent/"
-    az_devops_work_folder: "/home/{{ az_devops_agent_user }}/work/"
+    az_devops_work_folder: "/home/{{ az_devops_agent_user }}/agent/_work"
     az_devops_agent_pool_name: "Default"
     az_devops_agent_role: "build"
     az_devops_deployment_group_tags: null
@@ -29,7 +29,7 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_accountname**
 
-  The name of your Azure DevOps account, i.e. https://YOUR_ACCOUNT_NAME.visualstudio.com
+  The name of your Azure DevOps account, i.e. ttps://dev.azure.com/YOUR_ACCOUNT_NAME
 
 - **az_devops_accesstoken**
 
@@ -39,7 +39,7 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_project_name**
 
-  The name of the Azure DevOps project in which to register the agent.
+  The name of the Azure DevOps project in which to register the agent (only used for deployment groups).
 
 - **az_devops_agent_version**
 
@@ -96,8 +96,7 @@ Including an example of how to use your role (for instance, with variables passe
         - az_devops_agent_role: build
         - az_devops_accountname: fubar
         - az_devops_accesstoken: ***
-        - az_devops_project_name: baz
 
 ## License
 
-Apache-2.0
+Copyright © 2019, GSoft inc. This code is licensed under the Apache License, Version 2.0. You may obtain a copy of this license at https://github.com/gsoft-inc/gsoft-license/blob/master/LICENSE.
