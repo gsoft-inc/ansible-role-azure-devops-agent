@@ -9,3 +9,4 @@ az_devops_agent_role: "build"
 az_devops_deployment_group_tags: null
 az_devops_deployment_group_name: "Default"
 az_devops_agent_replace_existing: false
+az_devops_project_name: null
