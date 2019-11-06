@@ -1,17 +1,20 @@
 - name: restart az-devops-agent
-  command: echo "restarting az-devops-agent..."
-  notify:
-    - stop az-devops-agent
-    - start az-devops-agent
+  become: true
+  systemd:
+    daemon_reload: true
+    state: restarted
+    name: azure_devops_agent
 
 - name: start az-devops-agent
-  command: ./svc.sh start
   become: true
-  args:
-    chdir: "{{ az_devops_agent_folder }}"
+  systemd:
+    daemon_reload: true
+    state: started
+    name: azure_devops_agent
 
 - name: stop az-devops-agent
-  command: ./svc.sh stop
   become: true
-  args:
-    chdir: "{{ az_devops_agent_folder }}"
+  systemd:
+    daemon_reload: true
+    state: stopped
+    name: azure_devops_agent

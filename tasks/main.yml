@@ -1,6 +1,6 @@
 - name: Set agent config facts
   set_fact:
-    agent_cmd_args: 
+    agent_cmd_args:
       - "./config.sh"
       - "--unattended"
       - "--acceptteeeula"
@@ -20,9 +20,12 @@
       - "--projectname '{{ az_devops_project_name }}'"
 
 - name: Install requirements
-  apt:
-    name: ["libcurl3", "libunwind8"]
+  package:
+    name: "{{ item }}"
     state: present
+  loop:
+    - libcurl3
+    - libunwind8
   register: result
   until: result is succeeded
 
@@ -39,15 +42,13 @@
     owner: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_user }}"
     mode: 0755
-  with_items:
+  loop:
     - "{{ az_devops_agent_folder }}"
     - "{{ az_devops_work_folder }}"
 
 - name: Download and unarchive
   unarchive:
-    src: "https://vstsagentpackage.azureedge.net/agent/\
-      {{ az_devops_agent_version }}/\
-      vsts-agent-linux-x64-{{ az_devops_agent_version }}.tar.gz"
+    src: "{{ az_devops_agent_package_url }}"
     dest: "{{ az_devops_agent_folder }}"
     remote_src: yes
     owner: "{{ az_devops_agent_user }}"
@@ -112,8 +113,16 @@
   args:
     chdir: "{{ az_devops_agent_folder }}"
 
-- name: Start agent service
-  command: ./svc.sh start
+- name: Copy unit file
   become: true
-  args:
-    chdir: "{{ az_devops_agent_folder }}"
+  template:
+    src: azure_devops_agent.service.j2
+    dest: /usr/lib/systemd/system/azure_devops_agent.service
+  notify: restart az-devops-agent
+
+- name: ensure az-devops-agent is enabled on boot
+  become: true
+  systemd:
+    daemon_reload: true
+    state: started
+    name: azure_devops_agent
