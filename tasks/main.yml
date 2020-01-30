@@ -56,13 +56,13 @@
     creates: "{{ az_devops_agent_folder }}/config.sh"
 
 - name: Register agent service status
-  shell: ./svc.sh status | grep -q \(running\)
+  shell: ./svc.sh status | grep -q 'not installed'
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
   changed_when: false
-  failed_when: service_running.rc not in [0,1]
-  register: service_running
+  failed_when: service_not_installed.rc not in [0,1]
+  register: service_not_installed
 
 - name: Uninstall agent service
   command: ./svc.sh uninstall
@@ -70,7 +70,7 @@
   args:
     chdir: "{{ az_devops_agent_folder }}"
     removes: "{{ az_devops_agent_folder }}/runsvc.sh"
-  when: service_running.rc == 0
+  when: service_not_installed.rc == 1
 
 - name: Unconfigure agent
   command: "./config.sh remove --auth PAT --token {{ az_devops_accesstoken }}"
@@ -79,7 +79,6 @@
     removes: "{{ az_devops_agent_folder }}/.agent"
   become: true
   become_user: "{{ az_devops_agent_user }}"
-  when: service_running.rc == 0
 
 - name: Add '--replace' configuration argument
   set_fact:
@@ -113,16 +112,8 @@
   args:
     chdir: "{{ az_devops_agent_folder }}"
 
-- name: Copy unit file
+- name: Start agent service
+  command: ./svc.sh start
   become: true
-  template:
-    src: azure_devops_agent.service.j2
-    dest: /usr/lib/systemd/system/azure_devops_agent.service
-  notify: restart az-devops-agent
-
-- name: ensure az-devops-agent is enabled on boot
-  become: true
-  systemd:
-    daemon_reload: true
-    state: started
-    name: azure_devops_agent
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
