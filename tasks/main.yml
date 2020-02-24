@@ -62,6 +62,7 @@
   changed_when: false
   failed_when: service_running.rc not in [0,1]
   register: service_running
+  check_mode: no
 
 - name: Uninstall agent service
   command: ./svc.sh uninstall
