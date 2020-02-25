@@ -1,6 +1,6 @@
 - name: Set agent config facts
   set_fact:
-    agent_cmd_args: 
+    agent_cmd_args:
       - "./config.sh"
       - "--unattended"
       - "--acceptteeeula"
@@ -20,9 +20,12 @@
       - "--projectname '{{ az_devops_project_name }}'"
 
 - name: Install requirements
-  apt:
-    name: ["libcurl3", "libunwind8"]
+  package:
+    name: "{{ item }}"
     state: present
+  loop:
+    - libcurl3
+    - libunwind8
   register: result
   until: result is succeeded
 
@@ -39,15 +42,13 @@
     owner: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_user }}"
     mode: 0755
-  with_items:
+  loop:
     - "{{ az_devops_agent_folder }}"
     - "{{ az_devops_work_folder }}"
 
 - name: Download and unarchive
   unarchive:
-    src: "https://vstsagentpackage.azureedge.net/agent/\
-      {{ az_devops_agent_version }}/\
-      vsts-agent-linux-x64-{{ az_devops_agent_version }}.tar.gz"
+    src: "{{ az_devops_agent_package_url }}"
     dest: "{{ az_devops_agent_folder }}"
     remote_src: yes
     owner: "{{ az_devops_agent_user }}"
@@ -55,14 +56,13 @@
     creates: "{{ az_devops_agent_folder }}/config.sh"
 
 - name: Register agent service status
-  shell: ./svc.sh status | grep -q \(running\)
+  shell: ./svc.sh status | grep -q 'not installed'
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
   changed_when: false
-  failed_when: service_running.rc not in [0,1]
-  register: service_running
-  check_mode: no
+  failed_when: service_not_installed.rc not in [0,1]
+  register: service_not_installed
 
 - name: Uninstall agent service
   command: ./svc.sh uninstall
@@ -70,7 +70,7 @@
   args:
     chdir: "{{ az_devops_agent_folder }}"
     removes: "{{ az_devops_agent_folder }}/runsvc.sh"
-  when: service_running.rc == 0
+  when: service_not_installed.rc == 1
 
 - name: Unconfigure agent
   command: "./config.sh remove --auth PAT --token {{ az_devops_accesstoken }}"
@@ -79,7 +79,6 @@
     removes: "{{ az_devops_agent_folder }}/.agent"
   become: true
   become_user: "{{ az_devops_agent_user }}"
-  when: service_running.rc == 0
 
 - name: Add '--replace' configuration argument
   set_fact:
