@@ -26,6 +26,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_deployment_group_tags: null
     az_devops_deployment_group_name: "Default"
     az_devops_agent_replace_existing: false
+    az_devops_reconfigure_agent: false
 
 - **az_devops_accountname**
 
@@ -83,7 +84,11 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_agent_replace_existing**
 
-  Adds the `--replace` argument to the configuration script for the scenario where you need to replace an exiting agent with a new host.
+  Adds the `--replace` argument to the configuration script for the [scenario where you need to replace an exiting agent with a new host](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#pool-and-agent-names).
+
+- **az_devops_reconfigure_agent**
+
+  Forces a reconfiguration of the agent even if the service is already active
 
 ## Example Playbook
 
