@@ -15,7 +15,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_accountname: null
     az_devops_accesstoken: null
     az_devops_project_name: null
-    az_devops_agent_version: 2.155.1
+    az_devops_agent_version: 2.165.1
     az_devops_agent_user: "az_devops_agent"
     az_devops_agent_name: "{{ ansible_hostname }}"
     az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}"
@@ -99,4 +99,4 @@ Including an example of how to use your role (for instance, with variables passe
 
 ## License
 
-Copyright © 2019, GSoft inc. This code is licensed under the Apache License, Version 2.0. You may obtain a copy of this license at https://github.com/gsoft-inc/gsoft-license/blob/master/LICENSE.
+Copyright © 2020, GSoft inc. This code is licensed under the Apache License, Version 2.0. You may obtain a copy of this license at https://github.com/gsoft-inc/gsoft-license/blob/master/LICENSE.
