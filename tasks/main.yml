@@ -24,7 +24,7 @@
     name: "{{ item }}"
     state: present
   loop:
-    - libcurl3
+    - libcurl4
     - libunwind8
   register: result
   until: result is succeeded
@@ -63,6 +63,7 @@
   changed_when: false
   failed_when: service_not_installed.rc not in [0,1]
   register: service_not_installed
+  check_mode: no
 
 - name: Uninstall agent service
   command: ./svc.sh uninstall
