@@ -15,7 +15,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_accountname: null
     az_devops_accesstoken: null
     az_devops_project_name: null
-    az_devops_agent_version: 2.155.1
+    az_devops_agent_version: 2.165.1
     az_devops_agent_user: "az_devops_agent"
     az_devops_agent_name: "{{ ansible_hostname }}"
     az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}"
@@ -26,6 +26,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_deployment_group_tags: null
     az_devops_deployment_group_name: "Default"
     az_devops_agent_replace_existing: false
+    az_devops_reconfigure_agent: false
 
 - **az_devops_accountname**
 
@@ -83,7 +84,11 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_agent_replace_existing**
 
-  Adds the `--replace` argument to the configuration script for the scenario where you need to replace an exiting agent with a new host.
+  Adds the `--replace` argument to the configuration script for the [scenario where you need to replace an exiting agent with a new host](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#pool-and-agent-names).
+
+- **az_devops_reconfigure_agent**
+
+  Forces a reconfiguration of the agent even if the service is already active
 
 ## Example Playbook
 
@@ -99,4 +104,4 @@ Including an example of how to use your role (for instance, with variables passe
 
 ## License
 
-Copyright © 2019, GSoft inc. This code is licensed under the Apache License, Version 2.0. You may obtain a copy of this license at https://github.com/gsoft-inc/gsoft-license/blob/master/LICENSE.
+Copyright © 2020, GSoft inc. This code is licensed under the Apache License, Version 2.0. You may obtain a copy of this license at https://github.com/gsoft-inc/gsoft-license/blob/master/LICENSE.
