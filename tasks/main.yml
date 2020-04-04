@@ -35,7 +35,7 @@
     creates: "{{ az_devops_agent_folder }}/config.sh"
 
 - name: Register agent service status
-  shell: ./svc.sh status | grep -q 'not installed'
+  shell: if [ ! -f "/etc/systemd/system/$(systemd-escape vsts.agent.akelius.{{ az_devops_agent_pool_name }}.{{ azure_virtual_machine_name }}.dservice)" ]; then true; else false; fi
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
