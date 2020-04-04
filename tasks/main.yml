@@ -34,6 +34,12 @@
     group: "{{ az_devops_agent_user }}"
     creates: "{{ az_devops_agent_folder }}/config.sh"
 
+- name: Install Dependencies via shipped script
+  command: ./bin/installdependencies.sh
+  become: true
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+
 - name: Register agent service status
   shell: if [ ! -f "/etc/systemd/system/$(systemd-escape vsts.agent.akelius.{{ az_devops_agent_pool_name }}.{{ azure_virtual_machine_name }}.dservice)" ]; then true; else false; fi
   become: true
