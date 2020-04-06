@@ -41,7 +41,12 @@
     chdir: "{{ az_devops_agent_folder }}"
 
 - name: Register agent service status
-  shell: if [ ! -f "/etc/systemd/system/$(systemd-escape vsts.agent.akelius.{{ az_devops_agent_pool_name }}.{{ azure_virtual_machine_name }}.dservice)" ]; then true; else false; fi
+  shell: |
+  if [ ! -f "/etc/systemd/system/$(systemd-escape vsts.agent.{{ az_devops_accountname }}.{{ az_devops_agent_pool_name }}.{{ az_devops_agent_name }}.dservice)" ]; then
+    true
+  else
+    false
+  fi
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
