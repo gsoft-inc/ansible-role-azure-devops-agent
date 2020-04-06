@@ -36,6 +36,9 @@
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
+  retries: 2
+  register: result
+  until: result is succeeded
 
 - name: Register agent service status
   shell: |
