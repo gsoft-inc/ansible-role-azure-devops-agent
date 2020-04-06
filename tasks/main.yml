@@ -1,10 +1,7 @@
 - name: Install requirements
   package:
-    name: "{{ item }}"
+    name: libunwind8
     state: present
-  loop:
-    - "{{ 'libcurl4' if ansible_distribution_major_version | int > 16 else 'libcurl3' }}"
-    - libunwind8
   register: result
   until: result is succeeded
 
@@ -96,7 +93,7 @@
     removes: "{{ az_devops_agent_folder }}/.agent"
   become: true
   become_user: "{{ az_devops_agent_user }}"
-  when: 
+  when:
     - service_is_installed
     - reconfigure_or_replace
 
@@ -104,7 +101,7 @@
   set_fact:
     build_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
     deployment_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-  when: 
+  when:
     - az_devops_agent_replace_existing
 
 - name: Configure agent as build server
