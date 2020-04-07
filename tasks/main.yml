@@ -30,8 +30,10 @@
   args:
     chdir: "{{ az_devops_agent_folder }}"
   retries: 2
-  register: result
-  until: result is succeeded
+  register: dep_install
+  until: dep_install is succeeded
+  changed_when:
+    - dep_install.stdout is regex("[1-9]\d* upgraded|[1-9]\d* newly installed")
 
 - name: Register agent service status
   shell: |
