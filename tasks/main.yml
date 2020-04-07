@@ -1,4 +1,4 @@
-- name: Add a agent user
+- name: Add an agent user
   user:
     name: "{{ az_devops_agent_user }}"
     comment: "Azure DevOps Agent"
@@ -24,7 +24,7 @@
     group: "{{ az_devops_agent_user }}"
     creates: "{{ az_devops_agent_folder }}/config.sh"
 
-- name: Install Dependencies via shipped script
+- name: Install dependencies via shipped script
   command: ./bin/installdependencies.sh
   become: true
   args:
@@ -56,7 +56,6 @@
       - "./config.sh"
       - "--unattended"
       - "--acceptteeeula"
-      - "--agent '{{ az_devops_agent_name }}'"
       - "--url '{{ az_devops_server_url }}'"
       - "--work _work"
       - "--auth PAT"
