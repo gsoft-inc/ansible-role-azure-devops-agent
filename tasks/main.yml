@@ -35,6 +35,15 @@
   changed_when:
     - dep_install.stdout is regex("[1-9]\d* upgraded|[1-9]\d* newly installed")
 
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+
 - name: Register agent service status
   shell: |
     if [ ! -f "/etc/systemd/system/$(systemd-escape vsts.agent.{{ az_devops_accountname }}.{{ az_devops_agent_pool_name }}.{{ az_devops_agent_name }}.service)" ]; then
