@@ -1,14 +1,4 @@
-- name: Install requirements
-  package:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - "{{ 'libcurl4' if ansible_distribution_major_version | int > 16 else 'libcurl3' }}"
-    - libunwind8
-  register: result
-  until: result is succeeded
-
-- name: Add a agent user
+- name: Add an agent user
   user:
     name: "{{ az_devops_agent_user }}"
     comment: "Azure DevOps Agent"
@@ -34,8 +24,33 @@
     group: "{{ az_devops_agent_user }}"
     creates: "{{ az_devops_agent_folder }}/config.sh"
 
+- name: Install dependencies via shipped script
+  command: ./bin/installdependencies.sh
+  become: true
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+  retries: 2
+  register: dep_install
+  until: dep_install is succeeded
+  changed_when:
+    - dep_install.stdout is regex("[1-9]\d* upgraded|[1-9]\d* newly installed")
+
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+
 - name: Register agent service status
-  shell: ./svc.sh status | grep -q 'not installed'
+  shell: |
+    if [ ! -f "/etc/systemd/system/$(systemd-escape vsts.agent.{{ az_devops_accountname }}.{{ az_devops_agent_pool_name }}.{{ az_devops_agent_name }}.service)" ]; then
+      true
+    else
+      false
+    fi
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
@@ -50,14 +65,14 @@
       - "./config.sh"
       - "--unattended"
       - "--acceptteeeula"
-      - "--agent '{{ az_devops_agent_name }}'"
       - "--url '{{ az_devops_server_url }}'"
       - "--work _work"
       - "--auth PAT"
       - "--token '{{ az_devops_accesstoken }}'"
       - "--runasservice"
     build_agent_cmd_args:
-      - "--pool '{{ az_devops_agent_pool_name }}'"
+      - "--pool"
+      - "--agent '{{ az_devops_agent_name }}'"
     deployment_agent_cmd_args:
       - "--deploymentgroup"
       - "--deploymentgroupname '{{ az_devops_deployment_group_name }}'"
@@ -84,7 +99,7 @@
     removes: "{{ az_devops_agent_folder }}/.agent"
   become: true
   become_user: "{{ az_devops_agent_user }}"
-  when: 
+  when:
     - service_is_installed
     - reconfigure_or_replace
 
@@ -92,7 +107,7 @@
   set_fact:
     build_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
     deployment_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-  when: 
+  when:
     - az_devops_agent_replace_existing
 
 - name: Configure agent as build server
