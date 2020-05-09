@@ -62,7 +62,7 @@
       - "--token '{{ az_devops_accesstoken }}'"
       - "--runasservice"
     build_agent_cmd_args:
-      - "--pool"
+      - "--pool '{{az_devops_agent_pool_name }}'"
       - "--agent '{{ az_devops_agent_name }}'"
     deployment_agent_cmd_args:
       - "--deploymentgroup"
