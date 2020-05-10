@@ -25,6 +25,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_agent_role: "build"
     az_devops_deployment_group_tags: null
     az_devops_deployment_group_name: "Default"
+    az_devops_environment_name: null
     az_devops_agent_replace_existing: false
     az_devops_reconfigure_agent: false
 
@@ -72,7 +73,7 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_agent_role**
 
-  Use either `build` or `deployment`. Build role allows the use of the agent as a build server in pipeline build or releases. Deployment role allows the use of the agent in a deployment group.
+  Use either `build`, `deployment` or `resource`. Build role allows the use of the agent as a build server in pipeline build or releases. Deployment role allows the use of the agent in a deployment group. Resource role allows the use of the agent as a virtual machine resource that can be targeted by deployments from a pipeline and belongs to an environment.
 
 - **az_devops_deployment_group_tags**
 
@@ -81,6 +82,10 @@ Available variables are listed below, along with default values (see `defaults/m
 - **az_devops_deployment_group_name**
 
   Use in conjuction with the `deployment` agent role. The name of the deployment group in which to add the agent.
+
+- **az_devops_environment_name**
+
+  Use in conjuction with the `resource` agent role. The name of the environment in which to add the VM resource.
 
 - **az_devops_agent_replace_existing**
 
