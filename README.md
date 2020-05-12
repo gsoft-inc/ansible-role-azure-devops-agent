@@ -29,7 +29,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_agent_replace_existing: false
     az_devops_reconfigure_agent: false
     az_devops_agent_user_capabilties:
-    user_capabilty_key: user_capability_value
+      user_capabilty_key: user_capability_value
 
 - **az_devops_accountname**
 
