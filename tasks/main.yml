@@ -37,17 +37,13 @@
 
 - name: Register agent service status
   shell: |
-    if [ ! -f "/etc/systemd/system/$(systemd-escape --path vsts.agent.{{ az_devops_accountname }}.{{ az_devops_environment_name is defined | ternary('', az_devops_agent_pool_name) }}.{{ az_devops_agent_name }}.service)" ]; then
-      true
-    else
-      false
-    fi
+    [ -n "$(find /etc/systemd/system/ -name vsts.agent.$(systemd-escape -p {{ az_devops_accountname }} | sed 's/\\/\\\\/g').*.$(systemd-escape -p {{ az_devops_agent_name }} | sed 's/\\/\\\\/g').service | head -1 )" ] && echo true || echo false
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
   changed_when: false
-  failed_when: service_not_installed.rc not in [0,1]
-  register: service_not_installed
+  failed_when: service_is_installed.rc > 0
+  register: service_is_installed
   check_mode: no
 
 - name: Set agent config facts
@@ -70,12 +66,12 @@
       - "--addDeploymentGroupTags"
       - "--deploymentGroupTags '{{ az_devops_deployment_group_tags }}'"
       - "--projectname '{{ az_devops_project_name }}'"
-    resource_agent_cmd_args: 
+    resource_agent_cmd_args:
       - "--environment"
       - "--environmentname '{{ az_devops_environment_name }}'"
       - "--agent '{{ az_devops_agent_name }}'"
       - "--projectname '{{ az_devops_project_name }}'"
-    service_is_installed: "{{ service_not_installed.rc == 1 }}"
+    service_is_installed: "{{ service_is_installed.stdout }}"
     reconfigure_or_replace: "{{ az_devops_reconfigure_agent or az_devops_agent_replace_existing }}"
 
 - name: Uninstall agent service
@@ -139,6 +135,15 @@
   when:
     - az_devops_agent_role == 'resource'
     - (not service_is_installed) or reconfigure_or_replace
+
+- name: Set provided user defined capabilities
+  ini_file:
+    path: "{{ az_devops_agent_folder }}/.env"
+    section: null
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+    no_extra_space: yes
+  loop: "{{ (az_devops_agent_user_capabilities | default({})) | dict2items }}"
 
 - name: Install agent service
   command: ./svc.sh install {{ az_devops_agent_user }}

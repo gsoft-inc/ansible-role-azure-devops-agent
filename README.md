@@ -28,6 +28,8 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_environment_name: null
     az_devops_agent_replace_existing: false
     az_devops_reconfigure_agent: false
+    az_devops_agent_user_capabilties:
+    user_capabilty_key: user_capability_value
 
 - **az_devops_accountname**
 
@@ -94,6 +96,10 @@ Available variables are listed below, along with default values (see `defaults/m
 - **az_devops_reconfigure_agent**
 
   Forces a reconfiguration of the agent even if the service is already active
+
+- **az_devops_agent_user_capabilties**
+
+  A Dictionary of environment variables to set for the agent process which translate to User Capabilties which can be helpful for setting [release pipeline demands](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/demands?view=azure-devops&tabs=yaml)
 
 ## Example Playbook
 
