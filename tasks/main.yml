@@ -37,11 +37,10 @@
 
 - name: Register agent service status
   shell: |
-    if [ ! -f "/etc/systemd/system/$(systemd-escape vsts.agent.{{ az_devops_accountname }}.{{ az_devops_agent_pool_name }}.{{ az_devops_agent_name }}.service)" ]; then
-      true
-    else
-      false
-    fi
+    for f in /etc/systemd/system/vsts.agent.$(systemd-escape {{ az_devops_accountname }} | sed 's/\\/\\\\/g').*.$(systemd-escape {{ az_devops_agent_name }} | sed 's/\\/\\\\/g').service"; do
+        [ -e "$f" ] && exit 1 || exit 0
+        break
+    done
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
@@ -62,7 +61,7 @@
       - "--token '{{ az_devops_accesstoken }}'"
       - "--runasservice"
     build_agent_cmd_args:
-      - "--pool '{{az_devops_agent_pool_name }}'"
+      - "--pool '{{ az_devops_agent_pool_name }}'"
       - "--agent '{{ az_devops_agent_name }}'"
     deployment_agent_cmd_args:
       - "--deploymentgroup"
@@ -122,6 +121,15 @@
   when:
     - az_devops_agent_role == 'deployment'
     - (not service_is_installed) or reconfigure_or_replace
+
+- name: Set provided user defined capabilities
+  ini_file:
+    path: "{{ az_devops_agent_folder }}/.env"
+    section: null
+    option: "{{ item.key }}"
+    value: "{{ item.value }}"
+    no_extra_space: yes
+  loop: "{{ az_devops_agent_user_capabilities | dict2items }}"
 
 - name: Install agent service
   command: ./svc.sh install {{ az_devops_agent_user }}
