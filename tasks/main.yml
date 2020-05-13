@@ -35,18 +35,21 @@
   changed_when:
     - dep_install.stdout is regex("[1-9]\d* upgraded|[1-9]\d* newly installed")
 
-- name: Register agent service status
-  shell: |
-    for f in /etc/systemd/system/vsts.agent.$(systemd-escape {{ az_devops_accountname }} | sed 's/\\/\\\\/g').*.$(systemd-escape {{ az_devops_agent_name }} | sed 's/\\/\\\\/g').service"; do
-        [ -e "$f" ] && exit 1 || exit 0
-        break
-    done
+- name: Check if service is installed
+  stat:
+    path: "{{ az_devops_agent_folder }}/runsvc.sh"
+  become: true
+  changed_when: false
+  register: runsvc_result
+  check_mode: no
+
+- name: Check service status
+  command: ./svc.sh status
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
+  register: svc_status
   changed_when: false
-  failed_when: service_not_installed.rc not in [0,1]
-  register: service_not_installed
   check_mode: no
 
 - name: Set agent config facts
@@ -66,11 +69,16 @@
     deployment_agent_cmd_args:
       - "--deploymentgroup"
       - "--deploymentgroupname '{{ az_devops_deployment_group_name }}'"
-      - "--addDeploymentGroupTags"
-      - "--deploymentGroupTags '{{ az_devops_deployment_group_tags }}'"
       - "--projectname '{{ az_devops_project_name }}'"
-    service_is_installed: "{{ service_not_installed.rc == 1 }}"
+    service_is_installed: "{{ svc_status.stdout is not regex('not installed') }}"
+    service_is_running: "{{ svc_status.stdout is regex('active \\(running\\)') }}"
     reconfigure_or_replace: "{{ az_devops_reconfigure_agent or az_devops_agent_replace_existing }}"
+
+- name: Add deployment group tags
+  set_fact:
+    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} + ['--addDeploymentGroupTags', '--deploymentGroupTags \\'{{ az_devops_deployment_group_tags }}\\'']"
+  when:
+    - az_devops_deployment_group_tags is defined
 
 - name: Uninstall agent service
   command: ./svc.sh uninstall
@@ -96,7 +104,7 @@
 - name: Add '--replace' configuration argument
   set_fact:
     build_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-    deployment_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
+    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} + ['--replace']"
   when:
     - az_devops_agent_replace_existing
 
@@ -128,8 +136,8 @@
     section: null
     option: "{{ item.key }}"
     value: "{{ item.value }}"
-    no_extra_space: yes
-  loop: "{{ az_devops_agent_user_capabilities | dict2items }}"
+    no_extra_spaces: yes
+  loop: "{{ az_devops_agent_user_capabilities | default({}) | dict2items }}"
 
 - name: Install agent service
   command: ./svc.sh install {{ az_devops_agent_user }}
@@ -145,4 +153,4 @@
   args:
     chdir: "{{ az_devops_agent_folder }}"
   when:
-    - (not service_is_installed) or reconfigure_or_replace
+    - (not service_is_running) or reconfigure_or_replace

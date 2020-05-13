@@ -1,6 +1,6 @@
 # Azure DevOps Agent
 
-An Ansible role that installs and configures a Linux machine to be used as an [Azure DevOps build or deployment agent](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=vsts).
+An Ansible role that installs and configures a Linux machine to be used as an [Azure DevOps build or deployment agent](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops).
 
 See [this blog post](https://medium.com/gsoft-tech/easily-configuring-an-azure-devops-agent-with-ansible-fb9cb0f98b73) for more detail.
 
@@ -15,7 +15,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_accountname: null
     az_devops_accesstoken: null
     az_devops_project_name: null
-    az_devops_agent_version: 2.165.1
+    az_devops_agent_version: 2.168.1
     az_devops_agent_user: "az_devops_agent"
     az_devops_agent_name: "{{ ansible_hostname }}"
     az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}"
@@ -24,11 +24,10 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_agent_pool_name: "Default"
     az_devops_agent_role: "build"
     az_devops_deployment_group_tags: null
-    az_devops_deployment_group_name: "Default"
+    az_devops_deployment_group_name: null
     az_devops_agent_replace_existing: false
     az_devops_reconfigure_agent: false
-    az_devops_agent_user_capabilties:
-      user_capabilty_key: user_capability_value
+    az_devops_agent_user_capabilties: null
 
 - **az_devops_accountname**
 
@@ -82,7 +81,7 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_deployment_group_name**
 
-  Use in conjuction with the `deployment` agent role. The name of the deployment group in which to add the agent.
+  Use in conjuction with the `deployment` agent role. The name of the deployment group in which to add the agent.  **This needs to be manually created in you Azure DevOps project beforehand.**
 
 - **az_devops_agent_replace_existing**
 
@@ -96,9 +95,13 @@ Available variables are listed below, along with default values (see `defaults/m
 
   A Dictionary of environment variables to set for the agent process which translate to User Capabilties which can be helpful for setting [release pipeline demands](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/demands?view=azure-devops&tabs=yaml)
 
-## Example Playbook
+  Example usage:
+    - az_devops_agent_user_capabilties:
+      user_capabilty_key: user_capability_value
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+## Example Playbooks
+
+### Build Agent
 
     - hosts: agents
       roles:
@@ -107,6 +110,19 @@ Including an example of how to use your role (for instance, with variables passe
         - az_devops_agent_role: build
         - az_devops_accountname: fubar
         - az_devops_accesstoken: ***
+
+### Deployment Agent
+
+    - hosts: agents
+      roles:
+         - yohanb.azure_devops_agent
+      vars:
+        - az_devops_agent_role: deployment
+        - az_devops_accountname: fubar
+        - az_devops_accesstoken: ***
+        - az_devops_project_name: baz
+        - az_devops_deployment_group_name: fubar_group
+        - az_devops_deployment_group_tags: "web,prod"
 
 ## License
 
