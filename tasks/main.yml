@@ -72,6 +72,20 @@
     service_is_installed: "{{ service_not_installed.rc == 1 }}"
     reconfigure_or_replace: "{{ az_devops_reconfigure_agent or az_devops_agent_replace_existing }}"
 
+- name: Set proxy config facts
+  when: az_devops_proxy_used
+  set_fact:
+   agent_cmd_args_extra:
+     - "--proxyurl {{ az_devops_proxy_url }}"
+     - '--proxyusername "{{ az_devops_proxy_username }}"'
+     - '--proxypassword "{{ az_devops_proxy_password }}"'
+  
+- name: Merge facts
+  set_fact:
+    agent_cmd_args: "{{agent_cmd_args + agent_cmd_args_extra}}"
+  when: az_devops_proxy_used
+  tags:
+
 - name: Uninstall agent service
   command: ./svc.sh uninstall
   become: true
