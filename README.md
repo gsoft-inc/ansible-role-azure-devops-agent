@@ -86,7 +86,7 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_environment_name**
 
-  Use in conjuction with the `resource` agent role. The name of the environment in which to add the VM resource.
+  Use in conjuction with the `resource` agent role. The name of the environment in which to add the VM resource.  **This needs to be manually created in you Azure DevOps project beforehand.**
 
 - **az_devops_agent_replace_existing**
 
@@ -128,6 +128,18 @@ Available variables are listed below, along with default values (see `defaults/m
         - az_devops_project_name: baz
         - az_devops_deployment_group_name: fubar_group
         - az_devops_deployment_group_tags: "web,prod"
+
+### Resource
+
+    - hosts: agents
+      roles:
+         - gsoft.azure_devops_agent
+      vars:
+        - az_devops_agent_role: resource
+        - az_devops_accountname: fubar
+        - az_devops_accesstoken: ***
+        - az_devops_project_name: baz
+        - az_devops_environment_name: staging
 
 ## License
 
