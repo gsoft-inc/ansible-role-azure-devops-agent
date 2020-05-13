@@ -35,14 +35,6 @@
   changed_when:
     - dep_install.stdout is regex("[1-9]\d* upgraded|[1-9]\d* newly installed")
 
-- name: Check if service is installed
-  stat:
-    path: "{{ az_devops_agent_folder }}/runsvc.sh"
-  become: true
-  changed_when: false
-  register: runsvc_result
-  check_mode: no
-
 - name: Check service status
   command: ./svc.sh status
   become: true
@@ -69,6 +61,11 @@
     deployment_agent_cmd_args:
       - "--deploymentgroup"
       - "--deploymentgroupname '{{ az_devops_deployment_group_name }}'"
+      - "--projectname '{{ az_devops_project_name }}'"
+    resource_agent_cmd_args:
+      - "--environment"
+      - "--environmentname '{{ az_devops_environment_name }}'"
+      - "--agent '{{ az_devops_agent_name }}'"
       - "--projectname '{{ az_devops_project_name }}'"
     service_is_installed: "{{ svc_status.stdout is not regex('not installed') }}"
     service_is_running: "{{ svc_status.stdout is regex('active \\(running\\)') }}"
@@ -104,11 +101,12 @@
 - name: Add '--replace' configuration argument
   set_fact:
     build_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} + ['--replace']"
+    deployment_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
+    resource_agent_cmd_args: "{{ resource_agent_cmd_args }} + ['--replace']"
   when:
     - az_devops_agent_replace_existing
 
-- name: Configure agent as build server
+- name: Configure agent as a build server
   command: "{{ (agent_cmd_args + build_agent_cmd_args) | join(' ') }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
@@ -119,7 +117,7 @@
     - az_devops_agent_role == 'build'
     - (not service_is_installed) or reconfigure_or_replace
 
-- name: Configure agent as deployment server
+- name: Configure agent as a deployment server
   command: "{{ (agent_cmd_args + deployment_agent_cmd_args) | join(' ') }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
@@ -128,6 +126,17 @@
   become_user: "{{ az_devops_agent_user }}"
   when:
     - az_devops_agent_role == 'deployment'
+    - (not service_is_installed) or reconfigure_or_replace
+
+- name: Configure agent as an environment resource
+  command: "{{ (agent_cmd_args + resource_agent_cmd_args) | join(' ') }}"
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+    creates: "{{ az_devops_agent_folder }}/.agent"
+  become: true
+  become_user: "{{ az_devops_agent_user }}"
+  when:
+    - az_devops_agent_role == 'resource'
     - (not service_is_installed) or reconfigure_or_replace
 
 - name: Set provided user defined capabilities
