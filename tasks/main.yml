@@ -35,15 +35,13 @@
   changed_when:
     - dep_install.stdout is regex("[1-9]\d* upgraded|[1-9]\d* newly installed")
 
-- name: Register agent service status
-  shell: |
-    [ -n "$(find /etc/systemd/system/ -name vsts.agent.$(systemd-escape -p {{ az_devops_accountname }} | sed 's/\\/\\\\/g').*.$(systemd-escape -p {{ az_devops_agent_name }} | sed 's/\\/\\\\/g').service | head -1 )" ] && echo true || echo false
+- name: Check service status
+  command: ./svc.sh status
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
+  register: svc_status
   changed_when: false
-  failed_when: service_is_installed.rc > 0
-  register: service_is_installed
   check_mode: no
 
 - name: Set agent config facts
@@ -63,16 +61,21 @@
     deployment_agent_cmd_args:
       - "--deploymentgroup"
       - "--deploymentgroupname '{{ az_devops_deployment_group_name }}'"
-      - "--addDeploymentGroupTags"
-      - "--deploymentGroupTags '{{ az_devops_deployment_group_tags }}'"
       - "--projectname '{{ az_devops_project_name }}'"
     resource_agent_cmd_args:
       - "--environment"
       - "--environmentname '{{ az_devops_environment_name }}'"
       - "--agent '{{ az_devops_agent_name }}'"
       - "--projectname '{{ az_devops_project_name }}'"
-    service_is_installed: "{{ service_is_installed.stdout }}"
+    service_is_installed: "{{ svc_status.stdout is not regex('not installed') }}"
+    service_is_running: "{{ svc_status.stdout is regex('active \\(running\\)') }}"
     reconfigure_or_replace: "{{ az_devops_reconfigure_agent or az_devops_agent_replace_existing }}"
+
+- name: Add deployment group tags
+  set_fact:
+    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} + ['--addDeploymentGroupTags', '--deploymentGroupTags \\'{{ az_devops_deployment_group_tags }}\\'']"
+  when:
+    - az_devops_deployment_group_tags is defined
 
 - name: Uninstall agent service
   command: ./svc.sh uninstall
@@ -103,7 +106,7 @@
   when:
     - az_devops_agent_replace_existing
 
-- name: Configure agent as build server
+- name: Configure agent as a build server
   command: "{{ (agent_cmd_args + build_agent_cmd_args) | join(' ') }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
@@ -114,7 +117,7 @@
     - az_devops_agent_role == 'build'
     - (not service_is_installed) or reconfigure_or_replace
 
-- name: Configure agent as deployment server
+- name: Configure agent as a deployment server
   command: "{{ (agent_cmd_args + deployment_agent_cmd_args) | join(' ') }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
@@ -125,7 +128,7 @@
     - az_devops_agent_role == 'deployment'
     - (not service_is_installed) or reconfigure_or_replace
 
-- name: Configure agent as environment resource
+- name: Configure agent as an environment resource
   command: "{{ (agent_cmd_args + resource_agent_cmd_args) | join(' ') }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
@@ -142,8 +145,8 @@
     section: null
     option: "{{ item.key }}"
     value: "{{ item.value }}"
-    no_extra_space: yes
-  loop: "{{ (az_devops_agent_user_capabilities | default({})) | dict2items }}"
+    no_extra_spaces: yes
+  loop: "{{ az_devops_agent_user_capabilities | default({}) | dict2items }}"
 
 - name: Install agent service
   command: ./svc.sh install {{ az_devops_agent_user }}
@@ -159,4 +162,4 @@
   args:
     chdir: "{{ az_devops_agent_folder }}"
   when:
-    - (not service_is_installed) or reconfigure_or_replace
+    - (not service_is_running) or reconfigure_or_replace
