@@ -27,6 +27,10 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_deployment_group_name: "Default"
     az_devops_agent_replace_existing: false
     az_devops_reconfigure_agent: false
+    az_devops_proxy_used: "false"
+    az_devops_proxy_url: "http://localhost:8080"
+    az_devops_proxy_username: "username"
+    az_devops_proxy_password: "password"
     az_devops_agent_user_capabilties:
       user_capabilty_key: user_capability_value
 
@@ -92,6 +96,30 @@ Available variables are listed below, along with default values (see `defaults/m
 
   Forces a reconfiguration of the agent even if the service is already active
 
+- **az_devops_proxy_used**
+
+  Toggle for enabling a proxy to be used to contact azure
+
+- **az_devops_proxy_url**
+
+  The URL of the proxy server, format is http://url:port
+
+  This assumes the proxy does both http and https
+
+- **az_devops_proxy_username**
+
+  Username for the proxy
+
+  If the proxy does not require authentication, then just leave defaults
+
+- **az_devops_proxy_password**
+
+  *Highly suggested you use Ansible Vault*
+  
+  Password for the proxy
+
+  Again if proxy does not require authentication, just leave the defaults
+
 - **az_devops_agent_user_capabilties**
 
   A Dictionary of environment variables to set for the agent process which translate to User Capabilties which can be helpful for setting [release pipeline demands](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/demands?view=azure-devops&tabs=yaml)
@@ -108,6 +136,38 @@ Including an example of how to use your role (for instance, with variables passe
         - az_devops_accountname: fubar
         - az_devops_accesstoken: ***
 
+## Example Playbook - Advanced
+
+Showing the usage of a proxy, passing in variables from various sources such as Vault
+
+```yaml
+---
+- hosts: azure-agent
+
+  vars:
+    az_devops_accountname: account
+    az_devops_agent_version: 2.168.2
+    az_devops_agent_user: "az_devops_agent"
+    az_devops_agent_name: "{{ ansible_hostname }}"
+    az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}/"
+    az_devops_agent_folder: "/home/{{ az_devops_agent_user }}/agent/"
+    az_devops_work_folder: "/home/{{ az_devops_agent_user }}/agent/_work"
+    az_devops_agent_pool_name: "pool"
+    az_devops_agent_role: "build"
+    az_devops_deployment_group_tags: null
+    az_devops_agent_replace_existing: false
+    az_devops_reconfigure_agent: false
+    az_devops_project_name: null
+    az_devops_accesstoken: "{{vault_az_devops_token}}"
+    az_devops_agent_package_url: "https://vstsagentpackage.azureedge.net/agent/{{ az_devops_agent_version }}/vsts-agent-linux-x64-{{ az_devops_agent_version }}.tar.gz"
+
+    az_devops_proxy_used: true
+    az_devops_proxy_url: "http://127.0.0.1:8080"
+    az_devops_deployment_group_name: "Default"
+
+  roles:
+    - yohanb.azure_devops_agent
+```
 ## License
 
 Copyright © 2020, GSoft inc. This code is licensed under the Apache License, Version 2.0. You may obtain a copy of this license at https://github.com/gsoft-inc/gsoft-license/blob/master/LICENSE.
