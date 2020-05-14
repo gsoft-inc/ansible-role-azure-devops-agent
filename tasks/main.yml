@@ -77,6 +77,12 @@
   when:
     - az_devops_deployment_group_tags is defined
 
+- name: Set proxy
+  set_fact:
+    agent_cmd_args: "{{ agent_cmd_args }} + ['--proxyurl \\'{{ az_devops_proxy_url }}\\'', '--proxyusername \\'{{ az_devops_proxy_username }}\\'', '--proxypassword \\'{{ az_devops_proxy_password }}\\'']"
+  when: 
+    - az_devops_proxy_url is defined
+
 - name: Uninstall agent service
   command: ./svc.sh uninstall
   become: true

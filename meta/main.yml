@@ -2,7 +2,7 @@ galaxy_info:
   role_name: azure-devops-agent
   author: Yohan Belval
   description: Azure DevOps Agent for Linux.
-  company: Sharegate
+  company: GSoft
 
   license: "license (Apache-2.0)"
 

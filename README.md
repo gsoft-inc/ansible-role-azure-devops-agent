@@ -12,6 +12,7 @@ See [this blog post](https://medium.com/gsoft-tech/easily-configuring-an-azure-d
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
 
+```yaml
     az_devops_accountname: null
     az_devops_accesstoken: null
     az_devops_project_name: null
@@ -29,6 +30,10 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_agent_replace_existing: false
     az_devops_reconfigure_agent: false
     az_devops_agent_user_capabilties: null
+    az_devops_proxy_url: null
+    az_devops_proxy_username: null
+    az_devops_proxy_password: null
+```
 
 - **az_devops_accountname**
 
@@ -96,50 +101,94 @@ Available variables are listed below, along with default values (see `defaults/m
 
   Forces a reconfiguration of the agent even if the service is already active
 
+- **az_devops_proxy_url**
+
+  The URL of the proxy server, format is `http://url:port`
+
+  This assumes the proxy does both http and https
+
+- **az_devops_proxy_username**
+
+  Username for the proxy
+
+  If the proxy does not require authentication, then just leave defaults
+
+- **az_devops_proxy_password**
+  
+  Password for the proxy
+
+  Again if proxy does not require authentication, just leave the defaults.
+  
+  _Note: Think about using Ansible Vault to secure this value._
+
 - **az_devops_agent_user_capabilties**
 
   A Dictionary of environment variables to set for the agent process which translate to User Capabilties which can be helpful for setting [release pipeline demands](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/demands?view=azure-devops&tabs=yaml)
 
   Example usage:
+
+```yaml
     - az_devops_agent_user_capabilties:
       user_capabilty_key: user_capability_value
+```
 
 ## Example Playbooks
 
 ### Build Agent
 
-    - hosts: agents
-      roles:
-         - yohanb.azure_devops_agent
-      vars:
-        - az_devops_agent_role: build
-        - az_devops_accountname: fubar
-        - az_devops_accesstoken: ***
+```yaml
+- hosts: agents
+  roles:
+      - gsoft.azure_devops_agent
+  vars:
+    - az_devops_agent_role: build
+    - az_devops_accountname: fubar
+    - az_devops_accesstoken: ***
+```
 
 ### Deployment Agent
 
-    - hosts: agents
-      roles:
-         - yohanb.azure_devops_agent
-      vars:
-        - az_devops_agent_role: deployment
-        - az_devops_accountname: fubar
-        - az_devops_accesstoken: ***
-        - az_devops_project_name: baz
-        - az_devops_deployment_group_name: fubar_group
-        - az_devops_deployment_group_tags: "web,prod"
+```yaml
+- hosts: agents
+  roles:
+      - gsoft.azure_devops_agent
+  vars:
+    - az_devops_agent_role: deployment
+    - az_devops_accountname: fubar
+    - az_devops_accesstoken: ***
+    - az_devops_project_name: baz
+    - az_devops_deployment_group_name: fubar_group
+    - az_devops_deployment_group_tags: "web,prod"
+```
 
 ### Resource
 
-    - hosts: agents
-      roles:
-         - gsoft.azure_devops_agent
-      vars:
-        - az_devops_agent_role: resource
-        - az_devops_accountname: fubar
-        - az_devops_accesstoken: ***
-        - az_devops_project_name: baz
-        - az_devops_environment_name: staging
+```yaml
+- hosts: agents
+  roles:
+      - gsoft.azure_devops_agent
+  vars:
+    - az_devops_agent_role: resource
+    - az_devops_accountname: fubar
+    - az_devops_accesstoken: ***
+    - az_devops_project_name: baz
+    - az_devops_environment_name: staging
+```
+
+### Proxy
+
+```yaml
+- hosts: agents
+  roles:
+      - gsoft.azure_devops_agent
+  vars:
+    - az_devops_agent_role: build
+    - az_devops_accountname: fubar
+    - az_devops_accesstoken: ***
+    - az_devops_proxy_url: "http://127.0.0.1:8080"
+    - az_devops_proxy_username: bob
+    - az_devops_proxy_password: ***
+```
 
 ## License
 
