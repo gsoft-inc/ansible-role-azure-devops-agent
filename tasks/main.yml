@@ -35,6 +35,13 @@
   changed_when:
     - dep_install.stdout is regex("[1-9]\d* upgraded|[1-9]\d* newly installed")
 
+- name: Check if svc.sh exists
+  stat:
+    path: "{{ '/'.join((az_devops_agent_folder, 'svc.sh')) }}"
+  register: svc_sh
+  changed_when: false
+  check_mode: no
+
 - name: Check service status
   command: ./svc.sh status
   become: true
@@ -43,6 +50,7 @@
   register: svc_status
   changed_when: false
   check_mode: no
+  when: svc_sh.stat.exists
 
 - name: Set agent config facts
   set_fact:
@@ -67,8 +75,8 @@
       - "--environmentname '{{ az_devops_environment_name }}'"
       - "--agent '{{ az_devops_agent_name }}'"
       - "--projectname '{{ az_devops_project_name }}'"
-    service_is_installed: "{{ svc_status.stdout is not regex('not installed') }}"
-    service_is_running: "{{ svc_status.stdout is regex('active \\(running\\)') }}"
+    service_is_installed: "{{ svc_status.stdout is defined and svc_status.stdout is not regex('not installed') }}"
+    service_is_running: "{{ svc_status.stdout is defined and svc_status.stdout is regex('active \\(running\\)') }}"
     reconfigure_or_replace: "{{ az_devops_reconfigure_agent or az_devops_agent_replace_existing }}"
 
 - name: Add deployment group tags
