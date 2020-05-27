@@ -9,7 +9,7 @@ az_devops_agent_role: "build"
 az_devops_agent_replace_existing: false
 az_devops_reconfigure_agent: false
 az_devops_project_name: null
-az_devops_agent_package_url: "https://vstsagentpackage.azureedge.net/agent/{{ az_devops_agent_version }}/vsts-agent-linux-x64-{{ az_devops_agent_version }}.tar.gz"
+az_devops_agent_package_url: "https://vstsagentpackage.azureedge.net/agent/{{ az_devops_agent_version }}/vsts-agent-{{ 'rhel.6-x64' if (ansible_distribution in ['RedHat','CentOS']) else 'linux-x64' }}-{{ az_devops_agent_version }}.tar.gz"
 az_devops_environment_name: null
 az_devops_deployment_group_name: null
 az_devops_deployment_group_tags: null
