@@ -37,7 +37,7 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_accountname**
 
-  The name of your Azure DevOps account, i.e. ttps://dev.azure.com/YOUR_ACCOUNT_NAME
+  The name of your Azure DevOps account, i.e. https://dev.azure.com/YOUR_ACCOUNT_NAME
 
 - **az_devops_accesstoken**
 
