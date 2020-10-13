@@ -57,6 +57,10 @@ Available variables are listed below, along with default values (see `defaults/m
 
   Name of the user used to run and configure the service.
 
+- **az_devops_agent_group**
+
+  Default group of the user used to run and configure the service.
+
 - **az_devops_agent_name**
 
   Name of the agent shown in Azure DevOps (defaults to the name of the host.).

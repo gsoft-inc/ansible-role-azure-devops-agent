@@ -10,7 +10,7 @@
     state: directory
     path: "{{ item }}"
     owner: "{{ az_devops_agent_user }}"
-    group: "{{ az_devops_agent_user }}"
+    group: "{{ az_devops_agent_group }}"
     mode: 0755
   loop:
     - "{{ az_devops_agent_folder }}"
@@ -23,7 +23,7 @@
     dest: "{{ az_devops_agent_folder }}"
     remote_src: yes
     owner: "{{ az_devops_agent_user }}"
-    group: "{{ az_devops_agent_user }}"
+    group: "{{ az_devops_agent_group }}"
     creates: "{{ az_devops_agent_folder }}/config.sh"
   become: true
 
@@ -160,7 +160,7 @@
     value: "{{ item.value }}"
     no_extra_spaces: yes
     owner: "{{ az_devops_agent_user }}"
-    group: "{{ az_devops_agent_user }}"
+    group: "{{ az_devops_agent_group }}"
   loop: "{{ az_devops_agent_user_capabilities | default({}) | dict2items }}"
   become: true
 
