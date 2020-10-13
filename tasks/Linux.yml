@@ -27,21 +27,17 @@
     creates: "{{ az_devops_agent_folder }}/config.sh"
   become: true
 
-- name: Install dependencies via shipped script
-  command: ./bin/installdependencies.sh
+- name: Install dependencies
+  package:
+    name: "{{ az_devops_agent_dependencies }}"
+    state: latest
   become: true
-  args:
-    chdir: "{{ az_devops_agent_folder }}"
-  retries: 2
-  register: dep_install
-  until: dep_install is succeeded
-  changed_when:
-    - dep_install.stdout is regex("[1-9]\d* upgraded|[1-9]\d* newly installed")
 
 - name: Check if svc.sh exists
   stat:
     path: "{{ '/'.join((az_devops_agent_folder, 'svc.sh')) }}"
   register: svc_sh
+  become: true
   changed_when: false
   check_mode: no
 
