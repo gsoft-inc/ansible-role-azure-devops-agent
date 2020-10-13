@@ -8,6 +8,9 @@ See [this blog post](https://medium.com/gsoft-tech/easily-configuring-an-azure-d
 
 [See prerequisites](https://github.com/Microsoft/azure-pipelines-agent/blob/master/docs/start/envlinux.md)
 
+Installing on MacOS can be problematic when trying to use an admin user for connecting and another user for running the service.
+pipelining = True can help, especially if you run into issues where the devops agent user cannot access the temporary files ansible is creating.
+
 ## Role Variables
 
 Available variables are listed below, along with default values (see `defaults/main.yml`):
