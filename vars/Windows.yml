@@ -1,0 +1,5 @@
+az_devops_default_agent_folder: "C:/a"
+az_devops_default_work_folder: "C:/w"
+az_devops_default_agent_package_url: "https://vstsagentpackage.azureedge.net/agent/{{ az_devops_agent_version }}/vsts-agent-win-x64-{{ az_devops_agent_version }}.zip"
+az_devops_default_agent_local_package: "C:/vsts-agent-win-x64-{{ az_devops_agent_version }}.zip"
+az_devops_default_agent_group: "{{ az_devops_agent_user }}"
