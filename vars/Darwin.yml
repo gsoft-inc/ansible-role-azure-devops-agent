@@ -1,0 +1,6 @@
+az_devops_default_agent_folder: "/Users/{{ az_devops_agent_user }}/agent/"
+az_devops_default_work_folder: "/Users/{{ az_devops_agent_user }}/agent/_work"
+az_devops_launchagent_folder: "/Users/{{ az_devops_agent_user }}/Library/LaunchAgents"
+az_devops_default_agent_package_url: "https://vstsagentpackage.azureedge.net/agent/{{ az_devops_agent_version }}/vsts-agent-osx-x64-{{ az_devops_agent_version }}.tar.gz"
+az_devops_default_agent_local_package: "/Users/{{ az_devops_agent_user }}/vsts-agent-osx-x64-{{ az_devops_agent_version }}.tar.gz"
+az_devops_default_agent_group: admin

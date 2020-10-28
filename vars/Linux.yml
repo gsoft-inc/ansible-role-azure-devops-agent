@@ -1,0 +1,4 @@
+az_devops_default_agent_folder: "/home/{{ az_devops_agent_user }}/agent/"
+az_devops_default_work_folder: "/home/{{ az_devops_agent_user }}/agent/_work"
+az_devops_default_agent_package_url: "https://vstsagentpackage.azureedge.net/agent/{{ az_devops_agent_version }}/vsts-agent-linux-x64-{{ az_devops_agent_version }}.tar.gz"
+az_devops_default_agent_group: "{{ az_devops_agent_user }}"

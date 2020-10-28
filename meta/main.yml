@@ -11,12 +11,23 @@ galaxy_info:
   platforms:
     - name: Ubuntu
       versions:
-        - trusty
         - xenial
         - bionic
+        - focal
     - name: EL
       versions:
         - 7
+    - name: Debian
+      versions:
+        - stretch
+        - buster
+    - name: Windows
+      versions:
+        - 2016
+        - 2019
+    - name: MacOSX
+      versions:
+        - 10.15
 
   galaxy_tags:
     - azure
