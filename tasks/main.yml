@@ -3,6 +3,7 @@
     name: "{{ az_devops_agent_user }}"
     comment: "Azure DevOps Agent"
     shell: /bin/bash
+  become: true
 
 - name: Create directories
   file:
@@ -14,6 +15,7 @@
   loop:
     - "{{ az_devops_agent_folder }}"
     - "{{ az_devops_work_folder }}"
+  become: true
 
 - name: Download and unarchive
   unarchive:
@@ -23,6 +25,7 @@
     owner: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_user }}"
     creates: "{{ az_devops_agent_folder }}/config.sh"
+  become: true
 
 - name: Install dependencies via shipped script
   command: ./bin/installdependencies.sh
@@ -160,7 +163,10 @@
     option: "{{ item.key }}"
     value: "{{ item.value }}"
     no_extra_spaces: yes
+    owner: "{{ az_devops_agent_user }}"
+    group: "{{ az_devops_agent_user }}"
   loop: "{{ az_devops_agent_user_capabilities | default({}) | dict2items }}"
+  become: true
 
 - name: Install agent service
   command: ./svc.sh install {{ az_devops_agent_user }}
