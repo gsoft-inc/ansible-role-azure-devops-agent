@@ -17,16 +17,6 @@
     - "{{ az_devops_work_folder }}"
   become: true
 
-- name: Download and unarchive
-  unarchive:
-    src: "{{ az_devops_agent_package_url }}"
-    dest: "{{ az_devops_agent_folder }}"
-    remote_src: yes
-    owner: "{{ az_devops_agent_user }}"
-    group: "{{ az_devops_agent_group }}"
-    creates: "{{ az_devops_agent_folder }}/config.sh"
-  become: true
-
 - name: Install dependencies
   package:
     name: "{{ az_devops_agent_dependencies }}"
@@ -50,6 +40,24 @@
   changed_when: false
   check_mode: no
   when: svc_sh.stat.exists
+
+- name: Check if bin/Agent.Listener exists
+  stat:
+    path: "{{ '/'.join((az_devops_agent_folder, 'bin/Agent.Listener')) }}"
+  register: bin_agent_listener
+  become: true
+  changed_when: false
+  check_mode: no
+
+- name: Check agent version
+  command: ./bin/Agent.Listener --version
+  become: true
+  args:
+    chdir: "{{ az_devops_agent_folder }}"
+  register: agent_listener_version
+  changed_when: false
+  check_mode: no
+  when: bin_agent_listener.stat.exists
 
 - name: Set agent config facts
   set_fact:
@@ -76,7 +84,11 @@
       - "--projectname '{{ az_devops_project_name }}'"
     service_is_installed: "{{ svc_status.stdout is defined and svc_status.stdout is not regex('not installed') }}"
     service_is_running: "{{ svc_status.stdout is defined and svc_status.stdout is regex('active \\(running\\)') }}"
-    reconfigure_or_replace: "{{ az_devops_reconfigure_agent or az_devops_agent_replace_existing }}"
+    is_requested_version: "{{ bin_agent_listener.stat.exists and agent_listener_version.stdout is defined and agent_listener_version.stdout == az_devops_agent_version }}"
+
+- name: Determine if the agent should be reconfigured or replaced
+  set_fact:
+    reconfigure_or_replace: "{{ az_devops_reconfigure_agent or az_devops_agent_replace_existing or not is_requested_version }}"
 
 - name: Add deployment group tags
   set_fact:
@@ -87,10 +99,20 @@
 
 - name: Set proxy
   set_fact:
-    agent_cmd_args: "{{ agent_cmd_args }} + ['--proxyurl \\'{{ az_devops_proxy_url }}\\'',
-      '--proxyusername \\'{{ az_devops_proxy_username }}\\'', '--proxypassword \\'{{ az_devops_proxy_password }}\\'']"
+    agent_cmd_args: "{{ agent_cmd_args }} + ['--proxyurl \\'{{ az_devops_proxy_url }}\\'', '--proxyusername \\'{{ az_devops_proxy_username }}\\'', '--proxypassword \\'{{ az_devops_proxy_password }}\\'']"
   when:
     - az_devops_proxy_url is defined
+
+- name: Download and unarchive
+  unarchive:
+    src: "{{ az_devops_agent_package_url }}"
+    dest: "{{ az_devops_agent_folder }}"
+    remote_src: yes
+    owner: "{{ az_devops_agent_user }}"
+    group: "{{ az_devops_agent_group }}"
+  become: true
+  when:
+    - (not service_is_installed) or reconfigure_or_replace
 
 - name: Uninstall agent service
   command: ./svc.sh uninstall
