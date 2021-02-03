@@ -34,7 +34,7 @@
       - "/ProjectName:{{ az_devops_project_name }}"
     resource_agent_install_options:
       - "/Environment"
-      - "/EnvironmentName:{{ az_devops_environment_name }}"
+      - "/EnvironmentName:{{ az_devops_environment_name }}"
       - "/AgentName:{{ az_devops_agent_name }}"
       - "/ProjectName:{{ az_devops_project_name }}"
 
@@ -90,5 +90,5 @@
   win_chocolatey:
     name: azure-pipelines-agent
     state: present
-    version: '{{az_devops_agent_version}}'
+    version: "{{ az_devops_agent_version }}"
     package_params: "{{ az_devops_agent_package_params | join(' ') }}"

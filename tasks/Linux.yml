@@ -20,7 +20,7 @@
 - name: Install dependencies
   package:
     name: "{{ az_devops_agent_dependencies }}"
-    state: latest
+    state: present
   become: true
 
 - name: Check if svc.sh exists
@@ -79,7 +79,7 @@
       - "--projectname '{{ az_devops_project_name }}'"
     resource_agent_cmd_args:
       - "--environment"
-      - "--environmentname '{{ az_devops_environment_name }}'"
+      - "--environmentname '{{ az_devops_environment_name }}'"
       - "--agent '{{ az_devops_agent_name }}'"
       - "--projectname '{{ az_devops_project_name }}'"
     service_is_installed: "{{ svc_status.stdout is defined and svc_status.stdout is not regex('not installed') }}"
@@ -92,7 +92,8 @@
 
 - name: Add deployment group tags
   set_fact:
-    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} + ['--addDeploymentGroupTags', '--deploymentGroupTags \\'{{ az_devops_deployment_group_tags }}\\'']"
+    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} +
+      ['--addDeploymentGroupTags', '--deploymentGroupTags \\'{{ az_devops_deployment_group_tags }}\\'']"
   when:
     - az_devops_deployment_group_tags is defined
 
