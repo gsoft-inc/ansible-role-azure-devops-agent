@@ -1,5 +1,5 @@
 galaxy_info:
-  role_name: azure-devops-agent
+  role_name: azure_devops_agent
   author: Yohan Belval
   description: Azure DevOps Agent for Linux.
   company: GSoft
