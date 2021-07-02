@@ -19,7 +19,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_accountname: null
     az_devops_accesstoken: null
     az_devops_project_name: null
-    az_devops_agent_version: 2.168.1
+    az_devops_agent_version: 2.188.3
     az_devops_agent_user: "az_devops_agent"
     az_devops_agent_name: "{{ ansible_hostname }}"
     az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}"
