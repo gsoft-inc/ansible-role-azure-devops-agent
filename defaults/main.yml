@@ -1,4 +1,4 @@
-az_devops_agent_version: 2.181.1
+az_devops_agent_version: 2.188.3
 az_devops_agent_user: "az_devops_agent"
 az_devops_agent_name: "{{ ansible_hostname }}"
 az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}/"
