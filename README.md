@@ -54,7 +54,7 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_agent_version**
 
-  Version of the installed agent package. Should be periodically updated to the latest version (see [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=vsts#download-and-configure-the-agent))
+  Version of the installed agent package. Should be periodically updated to the latest version (see [here](https://github.com/microsoft/azure-pipelines-agent/releases/latest)).
 
 - **az_devops_agent_user**
 
