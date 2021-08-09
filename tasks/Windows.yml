@@ -4,7 +4,7 @@
     password: "{{ az_devops_agent_password }}"
     state: present
     password_never_expires: true
-  become: yes
+#   become: yes
 
 - name: Ensure chocolatey is present
   win_chocolatey:
