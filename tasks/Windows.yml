@@ -35,6 +35,7 @@
     resource_agent_install_options:
       - "/Environment"
       - "/EnvironmentName:{{ az_devops_environment_name }}"
+      - "/EnvironmentTags:{{ az_devops_environment_tags | join(',') }}"
       - "/AgentName:{{ az_devops_agent_name }}"
       - "/ProjectName:{{ az_devops_project_name }}"
 
