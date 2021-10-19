@@ -32,7 +32,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_deployment_group_name: null
     az_devops_agent_replace_existing: false
     az_devops_reconfigure_agent: false
-    az_devops_agent_user_capabilties: null
+    az_devops_agent_user_capabilities: null
     az_devops_proxy_url: null
     az_devops_proxy_username: null
     az_devops_proxy_password: null
