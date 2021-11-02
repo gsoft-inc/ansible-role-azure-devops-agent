@@ -22,7 +22,7 @@
       - "/Token:{{ az_devops_accesstoken }}"
       - "/Auth:PAT"
       - "/Pool:{{ az_devops_agent_pool_name }}"
-      - "/Work:_work"
+      - "/Work:{{ az_devops_work_folder }}
       - "/LogonAccount:{{ az_devops_agent_user }}"
       - "/LogonPassword:{{ az_devops_agent_password }}"
     build_agent_install_options:
