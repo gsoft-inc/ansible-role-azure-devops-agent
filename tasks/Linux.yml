@@ -177,7 +177,7 @@
     - (not service_is_installed) or reconfigure_or_replace
 
 - name: Set provided user defined capabilities
-  ini_file:
+  community.general.ini_file:
     path: "{{ az_devops_agent_folder }}/.env"
     section: null
     option: "{{ item.key }}"
