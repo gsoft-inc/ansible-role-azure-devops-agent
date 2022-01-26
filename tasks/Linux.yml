@@ -1,6 +1,7 @@
 - name: Add an agent user
   user:
     name: "{{ az_devops_agent_user }}"
+    group: "{{ az_devops_agent_group }}"
     comment: "Azure DevOps Agent"
     shell: /bin/bash
   become: true
