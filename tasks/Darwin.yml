@@ -4,6 +4,7 @@
     comment: "Azure DevOps Agent"
     shell: /bin/zsh
     group: "{{ az_devops_agent_group }}"
+    uid: "{{ az_devops_agent_uid|default(omit) }}"
   become: true
 
 - name: Create directories

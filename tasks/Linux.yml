@@ -2,6 +2,7 @@
   user:
     name: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_group }}"
+    uid: "{{ az_devops_agent_uid|default(omit) }}"
     comment: "Azure DevOps Agent"
     shell: /bin/bash
   become: true
