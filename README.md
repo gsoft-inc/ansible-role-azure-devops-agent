@@ -19,7 +19,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_accountname: null
     az_devops_accesstoken: null
     az_devops_project_name: null
-    az_devops_agent_version: 2.168.1
+    az_devops_agent_version: 2.188.3
     az_devops_agent_user: "az_devops_agent"
     az_devops_agent_uid: null
     az_devops_agent_name: "{{ ansible_hostname }}"
@@ -55,7 +55,7 @@ Available variables are listed below, along with default values (see `defaults/m
 
 - **az_devops_agent_version**
 
-  Version of the installed agent package. Should be periodically updated to the latest version (see [here](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=vsts#download-and-configure-the-agent))
+  Version of the installed agent package. Should be periodically updated to the latest version (see [here](https://github.com/microsoft/azure-pipelines-agent/releases/latest)).
 
 - **az_devops_agent_user**
 
