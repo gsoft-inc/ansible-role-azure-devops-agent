@@ -21,6 +21,7 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_project_name: null
     az_devops_agent_version: 2.168.1
     az_devops_agent_user: "az_devops_agent"
+    az_devops_agent_uid: null
     az_devops_agent_name: "{{ ansible_hostname }}"
     az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}"
     az_devops_agent_folder: "/home/{{ az_devops_agent_user }}/agent/"
@@ -59,6 +60,10 @@ Available variables are listed below, along with default values (see `defaults/m
 - **az_devops_agent_user**
 
   Name of the user used to run and configure the service.
+
+- **az_devops_agent_uid**
+
+  UID of the user used to run and configure the service.
 
 - **az_devops_agent_group**
 
@@ -121,11 +126,11 @@ Available variables are listed below, along with default values (see `defaults/m
   If the proxy does not require authentication, then just leave defaults
 
 - **az_devops_proxy_password**
-  
+
   Password for the proxy
 
   Again if proxy does not require authentication, just leave the defaults.
-  
+
   _Note: Think about using Ansible Vault to secure this value._
 
 - **az_devops_agent_user_capabilties**
