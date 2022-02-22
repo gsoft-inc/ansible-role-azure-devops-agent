@@ -68,7 +68,7 @@
       - "--unattended"
       - "--acceptteeeula"
       - "--url '{{ az_devops_server_url }}'"
-      - "--work _work"
+      - "--work '{{ az_devops_work_folder }}'"
       - "--auth PAT"
       - "--token '{{ az_devops_accesstoken }}'"
       - "--runasservice"
