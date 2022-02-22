@@ -6,7 +6,7 @@
     password_never_expires: true
   become: yes
   when:
-    - az_devops_agent_user_required
+    - az_devops_agent_create_local_user
     
 - name: Ensure chocolatey is present
   win_chocolatey:
