@@ -17,3 +17,4 @@ az_devops_deployment_group_tags: null
 az_devops_proxy_url: null
 az_devops_proxy_username: null
 az_devops_proxy_password: null
+az_devops_agent_create_local_user: true
