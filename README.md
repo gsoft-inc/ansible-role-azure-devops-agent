@@ -133,14 +133,14 @@ Available variables are listed below, along with default values (see `defaults/m
 
   _Note: Think about using Ansible Vault to secure this value._
 
-- **az_devops_agent_user_capabilties**
+- **az_devops_agent_user_capabilities**
 
-  A Dictionary of environment variables to set for the agent process which translate to User Capabilties which can be helpful for setting [release pipeline demands](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/demands?view=azure-devops&tabs=yaml)
+  A Dictionary of environment variables to set for the agent process which translate to User Capabilities which can be helpful for setting [release pipeline demands](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/demands?view=azure-devops&tabs=yaml)
 
   Example usage:
 
 ```yaml
-    - az_devops_agent_user_capabilties:
+    - az_devops_agent_user_capabilities:
       user_capabilty_key: user_capability_value
 ```
 
