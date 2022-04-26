@@ -1,3 +1,9 @@
+- name: Add an agent user group
+  group:
+    name: "{{ az_devops_agent_group }}"
+    state: present
+  become: true
+
 - name: Add an agent user
   user:
     name: "{{ az_devops_agent_user }}"
