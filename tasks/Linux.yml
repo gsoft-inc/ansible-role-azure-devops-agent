@@ -103,7 +103,7 @@
   set_fact:
     agent_cmd_args: "{{ agent_cmd_args }} + ['--proxyurl \\'{{ az_devops_proxy_url }}\\'', '--proxyusername \\'{{ az_devops_proxy_username }}\\'', '--proxypassword \\'{{ az_devops_proxy_password }}\\'']"
   when:
-    - az_devops_proxy_url is defined
+    - az_devops_proxy_url is not none
 
 - name: Download and unarchive
   unarchive:
