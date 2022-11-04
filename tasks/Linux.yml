@@ -97,7 +97,7 @@
     deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} +
       ['--addDeploymentGroupTags', '--deploymentGroupTags \\'{{ az_devops_deployment_group_tags }}\\'']"
   when:
-    - az_devops_deployment_group_tags is defined
+    - az_devops_deployment_group_tags is not none
 
 - name: Set proxy
   set_fact:
