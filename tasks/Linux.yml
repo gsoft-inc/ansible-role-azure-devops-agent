@@ -1,3 +1,8 @@
+- name: Create group {{ az_devops_agent_group }}
+  group:
+    name: "{{ az_devops_agent_group }}"
+    state: present
+
 - name: Add an agent user
   user:
     name: "{{ az_devops_agent_user }}"
@@ -94,20 +99,30 @@
 
 - name: Add deployment group tags
   set_fact:
-    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} +
-      ['--addDeploymentGroupTags', '--deploymentGroupTags \\'{{ az_devops_deployment_group_tags }}\\'']"
+    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args + ['--addDeploymentGroupTags', '--deploymentGroupTags', az_devops_deployment_group_tags ] }}"
   when:
-    - az_devops_deployment_group_tags is defined
+    - az_devops_deployment_group_tags is defined and az_devops_deployment_group_tags != None
 
-- name: Set proxy
+- name: Set proxy url
   set_fact:
-    agent_cmd_args: "{{ agent_cmd_args }} + ['--proxyurl \\'{{ az_devops_proxy_url }}\\'', '--proxyusername \\'{{ az_devops_proxy_username }}\\'', '--proxypassword \\'{{ az_devops_proxy_password }}\\'']"
+    agent_cmd_args: "{{ agent_cmd_args + ['--proxyurl',  az_devops_proxy_url] }}"
   when:
-    - az_devops_proxy_url is defined
+    - az_devops_proxy_url is defined and az_devops_proxy_url != None
 
-- name: Download and unarchive
+- name: Set proxy user and password
+  set_fact:
+    agent_cmd_args: "{{ agent_cmd_args + ['--proxyusername', az_devops_proxy_username, '--proxypassword', az_devops_proxy_password ] }}"
+  when:
+    - az_devops_proxy_url is defined and az_devops_proxy_url != None and az_devops_proxy_username != None and az_devops_proxy_password != None
+
+- name: Download {{ az_devops_agent_package_url }}
+  get_url:
+    url: "{{ az_devops_agent_package_url }}"
+    dest: "/tmp/az_devops_agent_package.tar.gz"
+
+- name: Unarchive /tmp/az_devops_agent_package.tar.gz
   unarchive:
-    src: "{{ az_devops_agent_package_url }}"
+    src: "/tmp/az_devops_agent_package.tar.gz"
     dest: "{{ az_devops_agent_folder }}"
     remote_src: yes
     owner: "{{ az_devops_agent_user }}"
@@ -139,9 +154,9 @@
 
 - name: Add '--replace' configuration argument
   set_fact:
-    build_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-    deployment_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-    resource_agent_cmd_args: "{{ resource_agent_cmd_args }} + ['--replace']"
+    build_agent_cmd_args: "{{ build_agent_cmd_args + ['--replace'] }}"
+    deployment_agent_cmd_args: "{{ build_agent_cmd_args + ['--replace'] }}"
+    resource_agent_cmd_args: "{{ resource_agent_cmd_args + ['--replace'] }}"
   when:
     - az_devops_agent_replace_existing
 
