@@ -7,7 +7,7 @@
   become: yes
   when:
     - az_devops_agent_create_local_user
-    
+
 - name: Ensure chocolatey is present
   win_chocolatey:
     name: chocolatey
@@ -42,49 +42,49 @@
 
 - name: Add '/Replace' configuration argument
   set_fact:
-    common_install_options: "{{ common_install_options }} + ['/Replace']"
+    common_install_options: "{{ common_install_options + ['/Replace'] }}"
   when:
     - az_devops_agent_replace_existing
 
 - name: Add deployment group tags
   set_fact:
-    deployment_install_options: "{{ deployment_install_options }} + ['/DeploymentGroupTags:{{ az_devops_deployment_group_tags }}']"
+    deployment_install_options: "{{ deployment_install_options + ['/DeploymentGroupTags:{{ az_devops_deployment_group_tags }}'] }}"
   when:
-    - az_devops_deployment_group_tags is defined
+    - az_devops_deployment_group_tags is defined and az_devops_deployment_group_tags != None
 
 - name: Add az_devops_proxy_url
   set_fact:
-    common_install_options: "{{ common_install_options }} + ['/ProxyUrl:{{ az_devops_proxy_url }}']"
+    common_install_options: "{{ common_install_options + ['/ProxyUrl:{{ az_devops_proxy_url }}'] }}"
   when:
-    - az_devops_proxy_url is defined and az_devops_proxy_url
+    - az_devops_proxy_url is defined and az_devops_proxy_url != None
 
 - name: Add az_devops_proxy_username
   set_fact:
-    common_install_options: "{{ common_install_options }} + ['/ProxyUserName:{{ az_devops_proxy_username }}']"
+    common_install_options: "{{ common_install_options + ['/ProxyUserName:{{ az_devops_proxy_username }}'] }}"
   when:
-    - az_devops_proxy_username is defined and az_devops_proxy_username
+    - az_devops_proxy_username is defined and az_devops_proxy_username != None
 
 - name: Add az_devops_proxy_password
   set_fact:
-    common_install_options: "{{ common_install_options }} + ['/ProxyPassword:{{ az_devops_proxy_password }}']"
+    common_install_options: "{{ common_install_options + ['/ProxyPassword:{{ az_devops_proxy_password }}'] }}"
   when:
-    - az_devops_proxy_password is defined and az_devops_proxy_password
+    - az_devops_proxy_password is defined and az_devops_proxy_password != None
 
 - name: Configure agent as a build server
   set_fact:
-    az_devops_agent_package_params: "{{ common_install_options }} + {{ build_agent_install_options }}"
+    az_devops_agent_package_params: "{{ common_install_options + build_agent_install_options }}"
   when:
      - az_devops_agent_role == 'build'
 
 - name: Configure agent as a deployment server
   set_fact:
-    az_devops_agent_package_params: "{{ common_install_options }} + {{ deployment_install_options }}"
+    az_devops_agent_package_params: "{{ common_install_options + deployment_install_options }}"
   when:
      - az_devops_agent_role == 'deployment'
 
 - name: Configure agent as an environment resource
   set_fact:
-    az_devops_agent_package_params: "{{ common_install_options }} + {{ resource_agent_install_options }}"
+    az_devops_agent_package_params: "{{ common_install_options + resource_agent_install_options }}"
   when:
      - az_devops_agent_role == 'resource'
 

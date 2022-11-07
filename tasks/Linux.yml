@@ -99,8 +99,7 @@
 
 - name: Add deployment group tags
   set_fact:
-    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args +
-      ['--addDeploymentGroupTags', '--deploymentGroupTags', az_devops_deployment_group_tags ] }}"
+    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args + ['--addDeploymentGroupTags', '--deploymentGroupTags', az_devops_deployment_group_tags ] }}"
   when:
     - az_devops_deployment_group_tags is defined and az_devops_deployment_group_tags != None
 
