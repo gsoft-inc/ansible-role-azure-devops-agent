@@ -93,11 +93,17 @@
   when:
     - az_devops_deployment_group_tags is defined and az_devops_deployment_group_tags != None
 
-- name: Set proxy
+- name: Set proxy url
   set_fact:
-    agent_cmd_args: "{{ agent_cmd_args + ['--proxyurl', az_devops_proxy_url, '--proxyusername', az_devops_proxy_username, '--proxypassword', az_devops_proxy_password] }}"
+    agent_cmd_args: "{{ agent_cmd_args + ['--proxyurl', az_devops_proxy_url] }}"
   when:
     - az_devops_proxy_url is defined and az_devops_proxy_url != None
+
+- name: Set proxy username and password
+  set_fact:
+    agent_cmd_args: "{{ agent_cmd_args + ['--proxyusername', az_devops_proxy_username, '--proxypassword', az_devops_proxy_password] }}"
+  when:
+    - az_devops_proxy_url is defined and az_devops_proxy_url != None and az_devops_proxy_username != None and az_devops_proxy_password != None
 
 - name: Uninstall agent service
   command: ./svc.sh uninstall
