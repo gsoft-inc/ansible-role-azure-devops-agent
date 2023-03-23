@@ -1,10 +1,18 @@
+---
+- name: Add an agent group {{ az_devops_agent_group }}
+  ansible.builtin.group:
+    name: "{{ az_devops_agent_group }}"
+    gid: "{{ az_devops_agent_gid | default(omit) }}"
+    state: present
+  become: true
+
 - name: Add an agent user
   ansible.builtin.user:
     name: "{{ az_devops_agent_user }}"
     comment: "Azure DevOps Agent"
     shell: /bin/zsh
     group: "{{ az_devops_agent_group }}"
-    uid: "{{ az_devops_agent_uid|default(omit) }}"
+    uid: "{{ az_devops_agent_uid | default(omit) }}"
   become: true
 
 - name: Create directories
@@ -47,7 +55,7 @@
   register: svc_sh
   become: true
   changed_when: false
-  check_mode: no
+  check_mode: false
 
 - name: Check service status
   ansible.builtin.command: ./svc.sh status
@@ -57,7 +65,7 @@
     chdir: "{{ az_devops_agent_folder }}"
   register: svc_status
   changed_when: false
-  check_mode: no
+  check_mode: false
   when: svc_sh.stat.exists
 
 - name: Set agent config facts
@@ -89,17 +97,21 @@
 
 - name: Add deployment group tags
   ansible.builtin.set_fact:
-    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} +
-      ['--addDeploymentGroupTags', '--deploymentGroupTags \\'{{ az_devops_deployment_group_tags }}\\'']"
+    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args + ['--addDeploymentGroupTags', '--deploymentGroupTags', az_devops_deployment_group_tags] }}"
   when:
-    - az_devops_deployment_group_tags is defined
+    - az_devops_deployment_group_tags is defined and az_devops_deployment_group_tags != None
 
-- name: Set proxy
+- name: Set proxy url
   ansible.builtin.set_fact:
-    agent_cmd_args: "{{ agent_cmd_args }} + ['--proxyurl \\'{{ az_devops_proxy_url }}\\'',
-      '--proxyusername \\'{{ az_devops_proxy_username }}\\'', '--proxypassword \\'{{ az_devops_proxy_password }}\\'']"
+    agent_cmd_args: "{{ agent_cmd_args + ['--proxyurl', az_devops_proxy_url] }}"
   when:
-    - az_devops_proxy_url is defined
+    - az_devops_proxy_url is defined and az_devops_proxy_url != None
+
+- name: Set proxy username and password
+  ansible.builtin.set_fact:
+    agent_cmd_args: "{{ agent_cmd_args + ['--proxyusername', az_devops_proxy_username, '--proxypassword', az_devops_proxy_password] }}"
+  when:
+    - az_devops_proxy_url is defined and az_devops_proxy_url != None and az_devops_proxy_username != None and az_devops_proxy_password != None
 
 - name: Uninstall agent service
   ansible.builtin.command: ./svc.sh uninstall
@@ -125,9 +137,9 @@
 
 - name: Add '--replace' configuration argument
   ansible.builtin.set_fact:
-    build_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-    deployment_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-    resource_agent_cmd_args: "{{ resource_agent_cmd_args }} + ['--replace']"
+    build_agent_cmd_args: "{{ build_agent_cmd_args + ['--replace'] }}"
+    deployment_agent_cmd_args: "{{ build_agent_cmd_args + ['--replace'] }}"
+    resource_agent_cmd_args: "{{ resource_agent_cmd_args + ['--replace'] }}"
   when:
     - az_devops_agent_replace_existing
 
@@ -170,14 +182,18 @@
     section: null
     option: "{{ item.key }}"
     value: "{{ item.value }}"
-    no_extra_spaces: yes
+    no_extra_spaces: true
     owner: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_group }}"
+    mode: "0640"
   loop: "{{ az_devops_agent_user_capabilities | default({}) | dict2items }}"
   become: true
 
 - name: Install agent service
   ansible.builtin.command: ./svc.sh install {{ az_devops_agent_user }}
+  register: agent_install
+  failed_when: agent_install.rc != 0
+  changed_when: agent_install.rc == 0
   become: true
   become_user: "{{ az_devops_agent_user }}"
   args:
@@ -187,9 +203,13 @@
 
 - name: Start agent service
   ansible.builtin.command: ./svc.sh start
+  register: agent_start
+  failed_when: agent_start.rc != 0
+  changed_when: agent_start.rc == 0
   become: true
   become_user: "{{ az_devops_agent_user }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
   when:
     - (not service_is_running) or reconfigure_or_replace
+...

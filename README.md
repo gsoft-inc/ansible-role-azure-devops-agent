@@ -19,9 +19,11 @@ Available variables are listed below, along with default values (see `defaults/m
     az_devops_accountname: null
     az_devops_accesstoken: null
     az_devops_project_name: null
-    az_devops_agent_version: 2.188.3
+    az_devops_agent_version: 2.218.1
     az_devops_agent_user: "az_devops_agent"
+    az_devops_agent_group: "az_devops_agent"
     az_devops_agent_uid: null
+    az_devops_agent_gid: null
     az_devops_agent_name: "{{ ansible_hostname }}"
     az_devops_server_url: "https://dev.azure.com/{{ az_devops_accountname }}"
     az_devops_agent_folder: "/home/{{ az_devops_agent_user }}/agent/"
@@ -68,6 +70,10 @@ Available variables are listed below, along with default values (see `defaults/m
 - **az_devops_agent_group**
 
   Default group of the user used to run and configure the service.
+
+- **az_devops_agent_gid**
+
+  GID of the user group used to run and configure the service.
 
 - **az_devops_agent_name**
 

@@ -1,12 +1,14 @@
+---
 galaxy_info:
   role_name: azure_devops_agent
-  author: Yohan Belval
+  author: gsoft
   description: Azure DevOps Agent for Linux.
   company: GSoft
+  standalone: true
 
   license: "license (Apache-2.0)"
 
-  min_ansible_version: 2.4
+  min_ansible_version: "2.10"
 
   platforms:
     - name: Ubuntu
@@ -14,20 +16,23 @@ galaxy_info:
         - xenial
         - bionic
         - focal
+        - jammy
     - name: EL
       versions:
-        - 7
+        - "7"
+        - "8"
     - name: Debian
       versions:
         - stretch
         - buster
+        - bullseye
     - name: Windows
       versions:
-        - 2016
-        - 2019
+        - "2016"
+        - "2019"
     - name: MacOSX
       versions:
-        - 10.15
+        - "10.15"
 
   galaxy_tags:
     - azure
@@ -37,3 +42,4 @@ galaxy_info:
     - deployment
     - ci
     - cd
+...
