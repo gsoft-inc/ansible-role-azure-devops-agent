@@ -1,0 +1,10 @@
+---
+az_devops_agent_dependencies:
+  - libcurl4
+  - libgssapi-krb5-2
+  - libicu70
+  - acl
+
+az_devops_agent_legacy_dependencies:
+  - http://security.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.17_amd64.deb
+...

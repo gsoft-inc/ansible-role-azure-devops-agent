@@ -1,6 +1,6 @@
 ---
 - name: Read platform-specific variables
-  include_vars: "{{ varfile }}"
+  ansible.builtin.include_vars: "{{ varfile }}"
   with_first_found:
     - files:
         - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
@@ -20,7 +20,7 @@
 #     - "ansible_system: {{ ansible_system }}"
 
 - name: Read platform-specific package list variables
-  include_vars: "{{ varfile }}"
+  ansible.builtin.include_vars: "{{ varfile }}"
   with_first_found:
     - files:
         - "dependencies-{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
@@ -33,7 +33,7 @@
     loop_var: varfile
 
 - name: Read platform specific tasks
-  include_tasks: "{{ taskfile }}"
+  ansible.builtin.include_tasks: "{{ taskfile }}"
   with_first_found:
     - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
