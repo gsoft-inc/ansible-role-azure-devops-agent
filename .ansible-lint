@@ -1,0 +1,3 @@
+---
+warn_list:
+  - yaml[line-length]

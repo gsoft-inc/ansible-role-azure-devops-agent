@@ -1,68 +1,69 @@
+---
 - name: Add an agent user
-  user:
+  ansible.builtin.user:
     name: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_group }}"
-    uid: "{{ az_devops_agent_uid|default(omit) }}"
+    uid: "{{ az_devops_agent_uid | default(omit) }}"
     comment: "Azure DevOps Agent"
     shell: /bin/bash
   become: true
 
 - name: Create directories
-  file:
+  ansible.builtin.file:
     state: directory
     path: "{{ item }}"
     owner: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_group }}"
-    mode: 0755
+    mode: '0755'
   loop:
     - "{{ az_devops_agent_folder }}"
     - "{{ az_devops_work_folder }}"
   become: true
 
 - name: Install dependencies
-  package:
+  ansible.builtin.package:
     name: "{{ az_devops_agent_dependencies }}"
     state: present
   become: true
 
 - name: Check if svc.sh exists
-  stat:
+  ansible.builtin.stat:
     path: "{{ '/'.join((az_devops_agent_folder, 'svc.sh')) }}"
   register: svc_sh
   become: true
   changed_when: false
-  check_mode: no
+  check_mode: false
 
 - name: Check service status
-  command: ./svc.sh status
+  ansible.builtin.command: ./svc.sh status
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
   register: svc_status
   changed_when: false
-  check_mode: no
+  check_mode: false
   when: svc_sh.stat.exists
 
 - name: Check if bin/Agent.Listener exists
-  stat:
+  ansible.builtin.stat:
     path: "{{ '/'.join((az_devops_agent_folder, 'bin/Agent.Listener')) }}"
   register: bin_agent_listener
   become: true
   changed_when: false
-  check_mode: no
+  check_mode: false
 
 - name: Check agent version
-  command: ./bin/Agent.Listener --version
+  ansible.builtin.command: ./bin/Agent.Listener --version
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
   register: agent_listener_version
   changed_when: false
-  check_mode: no
+  check_mode: false
   when: bin_agent_listener.stat.exists
 
 - name: Set agent config facts
-  set_fact:
+  ansible.builtin.set_fact:
     agent_cmd_args:
       - "./config.sh"
       - "--unattended"
@@ -89,27 +90,27 @@
     is_requested_version: "{{ bin_agent_listener.stat.exists and agent_listener_version.stdout is defined and agent_listener_version.stdout == az_devops_agent_version }}"
 
 - name: Determine if the agent should be reconfigured or replaced
-  set_fact:
+  ansible.builtin.set_fact:
     reconfigure_or_replace: "{{ az_devops_reconfigure_agent or az_devops_agent_replace_existing or not is_requested_version }}"
 
 - name: Add deployment group tags
-  set_fact:
+  ansible.builtin.set_fact:
     deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} +
       ['--addDeploymentGroupTags', '--deploymentGroupTags \\'{{ az_devops_deployment_group_tags }}\\'']"
   when:
     - az_devops_deployment_group_tags is defined
 
 - name: Set proxy
-  set_fact:
+  ansible.builtin.set_fact:
     agent_cmd_args: "{{ agent_cmd_args }} + ['--proxyurl \\'{{ az_devops_proxy_url }}\\'', '--proxyusername \\'{{ az_devops_proxy_username }}\\'', '--proxypassword \\'{{ az_devops_proxy_password }}\\'']"
   when:
     - az_devops_proxy_url is defined
 
 - name: Download and unarchive
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ az_devops_agent_package_url }}"
     dest: "{{ az_devops_agent_folder }}"
-    remote_src: yes
+    remote_src: true
     owner: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_group }}"
   become: true
@@ -117,7 +118,7 @@
     - (not service_is_installed) or reconfigure_or_replace
 
 - name: Uninstall agent service
-  command: ./svc.sh uninstall
+  ansible.builtin.command: ./svc.sh uninstall
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
@@ -127,7 +128,7 @@
     - reconfigure_or_replace
 
 - name: Unconfigure agent
-  command: "./config.sh remove --auth PAT --token {{ az_devops_accesstoken }}"
+  ansible.builtin.command: "./config.sh remove --auth PAT --token {{ az_devops_accesstoken }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
     removes: "{{ az_devops_agent_folder }}/.agent"
@@ -138,7 +139,7 @@
     - reconfigure_or_replace
 
 - name: Add '--replace' configuration argument
-  set_fact:
+  ansible.builtin.set_fact:
     build_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
     deployment_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
     resource_agent_cmd_args: "{{ resource_agent_cmd_args }} + ['--replace']"
@@ -146,7 +147,7 @@
     - az_devops_agent_replace_existing
 
 - name: Configure agent as a build server
-  command: "{{ (agent_cmd_args + build_agent_cmd_args) | join(' ') }}"
+  ansible.builtin.command: "{{ (agent_cmd_args + build_agent_cmd_args) | join(' ') }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
     creates: "{{ az_devops_agent_folder }}/.agent"
@@ -157,7 +158,7 @@
     - (not service_is_installed) or reconfigure_or_replace
 
 - name: Configure agent as a deployment server
-  command: "{{ (agent_cmd_args + deployment_agent_cmd_args) | join(' ') }}"
+  ansible.builtin.command: "{{ (agent_cmd_args + deployment_agent_cmd_args) | join(' ') }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
     creates: "{{ az_devops_agent_folder }}/.agent"
@@ -168,7 +169,7 @@
     - (not service_is_installed) or reconfigure_or_replace
 
 - name: Configure agent as an environment resource
-  command: "{{ (agent_cmd_args + resource_agent_cmd_args) | join(' ') }}"
+  ansible.builtin.command: "{{ (agent_cmd_args + resource_agent_cmd_args) | join(' ') }}"
   args:
     chdir: "{{ az_devops_agent_folder }}"
     creates: "{{ az_devops_agent_folder }}/.agent"
@@ -184,22 +185,23 @@
     section: null
     option: "{{ item.key }}"
     value: "{{ item.value }}"
-    no_extra_spaces: yes
+    no_extra_spaces: true
     owner: "{{ az_devops_agent_user }}"
     group: "{{ az_devops_agent_group }}"
+    mode: '0600'
   loop: "{{ az_devops_agent_user_capabilities | default({}) | dict2items }}"
   become: true
 
-- name: Install agent service
-  command: ./svc.sh install {{ az_devops_agent_user }}
+- name: Install agent service  # noqa no-changed-when
+  ansible.builtin.command: ./svc.sh install {{ az_devops_agent_user }}
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
   when:
     - (not service_is_installed) or reconfigure_or_replace
 
-- name: Start agent service
-  command: ./svc.sh start
+- name: Start agent service  # noqa no-changed-when
+  ansible.builtin.command: ./svc.sh start
   become: true
   args:
     chdir: "{{ az_devops_agent_folder }}"
