@@ -5,4 +5,6 @@ az_devops_agent_dependencies:
   - lttng-ust
   - openssl-libs
   - zlib
+  # mine only found the script install libicu lttng-ust userspace-rcu
+  - userspace-rcu
 ...
