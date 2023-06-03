@@ -88,23 +88,50 @@
     service_is_installed: "{{ svc_status.stdout is defined and svc_status.stdout is not regex('not installed') }}"
     service_is_running: "{{ svc_status.stdout is defined and svc_status.stdout is regex('active \\(running\\)') }}"
     is_requested_version: "{{ bin_agent_listener.stat.exists and agent_listener_version.stdout is defined and agent_listener_version.stdout == az_devops_agent_version }}"
+  no_log: "{{ az_devops_no_log | default(true) }}"
 
 - name: Determine if the agent should be reconfigured or replaced
   ansible.builtin.set_fact:
     reconfigure_or_replace: "{{ az_devops_reconfigure_agent or az_devops_agent_replace_existing or not is_requested_version }}"
 
 - name: Add deployment group tags
-  ansible.builtin.set_fact:
-    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} +
-      ['--addDeploymentGroupTags', '--deploymentGroupTags \\'{{ az_devops_deployment_group_tags }}\\'']"
   when:
     - az_devops_deployment_group_tags is defined
+    - az_devops_deployment_group_tags|string
+  block:
+    - name: Set fact temporary variable - deployment_agent_cmd_args_tmp
+      ansible.builtin.set_fact:
+        deployment_agent_cmd_args_tmp:
+          - '--addDeploymentGroupTags'
+          - "--deploymentGroupTags '{{ az_devops_deployment_group_tags }}'"
+      no_log: "{{ az_devops_no_log | default(true) }}"
+    - name: Set fact merge into main variable - deployment_agent_cmd_args
+      ansible.builtin.set_fact:
+        # need first filter else getting array of array of strings
+        deployment_agent_cmd_args:
+          # - "{{ (deployment_agent_cmd_args + deployment_agent_cmd_args_tmp) | first }}"
+          - "{{ (deployment_agent_cmd_args + deployment_agent_cmd_args_tmp) }}"
+      no_log: "{{ az_devops_no_log | default(true) }}"
 
 - name: Set proxy
-  ansible.builtin.set_fact:
-    agent_cmd_args: "{{ agent_cmd_args }} + ['--proxyurl \\'{{ az_devops_proxy_url }}\\'', '--proxyusername \\'{{ az_devops_proxy_username }}\\'', '--proxypassword \\'{{ az_devops_proxy_password }}\\'']"
   when:
     - az_devops_proxy_url is defined
+    - az_devops_proxy_url|string
+    - az_devops_proxy_username|string
+    - az_devops_proxy_password|string
+  block:
+    - name: Set fact temporary variable - agent_cmd_args_tmp
+      ansible.builtin.set_fact:
+        agent_cmd_args_tmp:
+          - "--proxyurl '{{ az_devops_proxy_url }}'"
+          - "--proxyusername '{{ az_devops_proxy_username }}'"
+          - "--proxypassword '{{ az_devops_proxy_password }}'"
+      no_log: "{{ az_devops_no_log | default(true) }}"
+    - name: Set fact merge into main variable agent_cmd_args
+      ansible.builtin.set_fact:
+        agent_cmd_args:
+          - "{{ (agent_cmd_args + agent_cmd_args_tmp) }}"
+      no_log: "{{ az_devops_no_log | default(true) }}"
 
 - name: Download and unarchive
   ansible.builtin.unarchive:
@@ -140,9 +167,9 @@
 
 - name: Add '--replace' configuration argument
   ansible.builtin.set_fact:
-    build_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-    deployment_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-    resource_agent_cmd_args: "{{ resource_agent_cmd_args }} + ['--replace']"
+    build_agent_cmd_args: "{{ build_agent_cmd_args + ['--replace'] }}"
+    deployment_agent_cmd_args: "{{ build_agent_cmd_args + ['--replace'] }}"
+    resource_agent_cmd_args: "{{ resource_agent_cmd_args + ['--replace'] }}"
   when:
     - az_devops_agent_replace_existing
 
@@ -156,6 +183,7 @@
   when:
     - az_devops_agent_role == 'build'
     - (not service_is_installed) or reconfigure_or_replace
+  no_log: "{{ az_devops_no_log | default(true) }}"
 
 - name: Configure agent as a deployment server
   ansible.builtin.command: "{{ (agent_cmd_args + deployment_agent_cmd_args) | join(' ') }}"
