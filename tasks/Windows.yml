@@ -50,25 +50,25 @@
   set_fact:
     deployment_install_options: "{{ deployment_install_options }} + ['/DeploymentGroupTags:{{ az_devops_deployment_group_tags }}']"
   when:
-    - az_devops_deployment_group_tags is defined
+    - az_devops_deployment_group_tags is defined and az_devops_deployment_group_tags != None
 
 - name: Add az_devops_proxy_url
   set_fact:
     common_install_options: "{{ common_install_options }} + ['/ProxyUrl:{{ az_devops_proxy_url }}']"
   when:
-    - az_devops_proxy_url is defined and az_devops_proxy_url
+    - az_devops_proxy_url is defined and az_devops_proxy_url != None
 
 - name: Add az_devops_proxy_username
   set_fact:
     common_install_options: "{{ common_install_options }} + ['/ProxyUserName:{{ az_devops_proxy_username }}']"
   when:
-    - az_devops_proxy_username is defined and az_devops_proxy_username
+    - az_devops_proxy_username is defined and az_devops_proxy_username != None
 
 - name: Add az_devops_proxy_password
   set_fact:
     common_install_options: "{{ common_install_options }} + ['/ProxyPassword:{{ az_devops_proxy_password }}']"
   when:
-    - az_devops_proxy_password is defined and az_devops_proxy_password
+    - az_devops_proxy_password is defined and az_devops_proxy_password != None
 
 - name: Configure agent as a build server
   set_fact:
