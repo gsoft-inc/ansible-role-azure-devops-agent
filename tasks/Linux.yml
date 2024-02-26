@@ -94,16 +94,15 @@
 
 - name: Add deployment group tags
   set_fact:
-    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args }} +
-      ['--addDeploymentGroupTags', '--deploymentGroupTags \\'{{ az_devops_deployment_group_tags }}\\'']"
+    deployment_agent_cmd_args: "{{ deployment_agent_cmd_args + ['--addDeploymentGroupTags', '--deploymentGroupTags' , az_devops_deployment_group_tags ] }}"
   when:
-    - az_devops_deployment_group_tags is defined
+    - az_devops_deployment_group_tags is not none
 
 - name: Set proxy
   set_fact:
-    agent_cmd_args: "{{ agent_cmd_args }} + ['--proxyurl \\'{{ az_devops_proxy_url }}\\'', '--proxyusername \\'{{ az_devops_proxy_username }}\\'', '--proxypassword \\'{{ az_devops_proxy_password }}\\'']"
+    agent_cmd_args: "{{ agent_cmd_args + ['--proxyurl' , az_devops_proxy_url, '--proxyusername' , az_devops_proxy_username, '--proxypassword', az_devops_proxy_password ] }}"
   when:
-    - az_devops_proxy_url is defined
+    - az_devops_proxy_url is not none
 
 - name: Download and unarchive
   unarchive:
@@ -139,9 +138,9 @@
 
 - name: Add '--replace' configuration argument
   set_fact:
-    build_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-    deployment_agent_cmd_args: "{{ build_agent_cmd_args }} + ['--replace']"
-    resource_agent_cmd_args: "{{ resource_agent_cmd_args }} + ['--replace']"
+    build_agent_cmd_args: "{{ build_agent_cmd_args + ['--replace'] }}"
+    deployment_agent_cmd_args: "{{ build_agent_cmd_args + ['--replace'] }}"
+    resource_agent_cmd_args: "{{ resource_agent_cmd_args + ['--replace'] }}"
   when:
     - az_devops_agent_replace_existing
 
