@@ -1,0 +1,6 @@
+az_devops_agent_dependencies:
+  - libcurl4
+  - libgssapi-krb5-2
+  - libicu66
+  - libssl1.1
+  - acl
